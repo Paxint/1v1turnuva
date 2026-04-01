@@ -3,7 +3,8 @@ import { getSetting, setSetting, deleteSetting, uploadImage } from '../../../lib
 import styles from './Tabs.module.css'
 
 export default function PosterlerTab({ theme }) {
-  const [posterSrc, setPosterSrc] = useState('/poster.png')
+  const [posterSrc, setPosterSrc] = useState(null)
+  const [imgError, setImgError] = useState(false)
   const [urlInput, setUrlInput] = useState('')
   const [sucMsg, setSucMsg] = useState('')
   const [dragOver, setDragOver] = useState(false)
@@ -12,13 +13,15 @@ export default function PosterlerTab({ theme }) {
   useEffect(() => {
     async function load() {
       const p = await getSetting(theme, 'poster_url')
-      setPosterSrc(p || '/poster.png')
+      setImgError(false)
+      setPosterSrc(p || null)
     }
     load()
   }, [theme])
 
   async function savePoster(src) {
     await setSetting(theme, 'poster_url', src)
+    setImgError(false)
     setPosterSrc(src)
     setSucMsg('✅ Kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
@@ -54,12 +57,19 @@ export default function PosterlerTab({ theme }) {
       <div className={styles.cardTitle}>🖼️ Anasayfa Posteri (Aktif Yayıncı)</div>
 
       <div className={styles.previewWrap}>
-        <img
-          src={posterSrc}
-          alt="Poster Önizleme"
-          style={{ width: '100%', display: 'block', minHeight: 60 }}
-          onError={e => { e.currentTarget.style.display = 'none' }}
-        />
+        {posterSrc && !imgError ? (
+          <img
+            key={posterSrc}
+            src={posterSrc}
+            alt="Poster Önizleme"
+            style={{ width: '100%', display: 'block' }}
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div style={{ padding: '2rem', textAlign: 'center', color: 'rgba(212,245,192,0.3)', fontSize: '0.85rem' }}>
+            {posterSrc ? '⚠️ Görsel yüklenemedi' : '📷 Henüz poster yüklenmedi'}
+          </div>
+        )}
       </div>
 
       {/* File drop zone */}
