@@ -4,8 +4,45 @@ import {
   addRegistration,
   deleteRegistration,
   clearRegistrations,
+  saveBracket,
 } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
+
+function buildBracket(players) {
+  const shuffled = [...players].sort(() => Math.random() - 0.5)
+  const n = shuffled.length
+  if (n < 2) return null
+  let p = 1
+  while (p < n) p *= 2
+  const byes = p - n
+  const numRounds = Math.log2(p)
+  const rounds = []
+  let mc = p / 2
+  for (let r = 0; r < numRounds; r++) {
+    rounds.push(Array.from({ length: mc }, (_, m) => ({ id: `r${r}m${m}`, p1: null, p2: null, winner: null })))
+    mc = Math.floor(mc / 2)
+  }
+  let pi = 0
+  for (let i = 0; i < rounds[0].length; i++) {
+    if (i < byes) {
+      rounds[0][i].p1 = shuffled[pi++]
+      rounds[0][i].winner = rounds[0][i].p1
+    } else {
+      rounds[0][i].p1 = shuffled[pi++]
+      rounds[0][i].p2 = shuffled[pi++]
+    }
+  }
+  if (rounds.length > 1) {
+    for (let i = 0; i < rounds[0].length; i++) {
+      if (rounds[0][i].winner) {
+        const nm = Math.floor(i / 2)
+        if (i % 2 === 0) rounds[1][nm].p1 = rounds[0][i].winner
+        else rounds[1][nm].p2 = rounds[0][i].winner
+      }
+    }
+  }
+  return { rounds }
+}
 
 export default function KayitlarTab() {
   const [list, setList] = useState([])
@@ -15,6 +52,7 @@ export default function KayitlarTab() {
   const [addErr, setAddErr] = useState('')
   const [exportText, setExportText] = useState('')
   const [copySuc, setCopySuc] = useState(false)
+  const [bracketMsg, setBracketMsg] = useState('')
 
   async function load() {
     const rows = await getRegistrations()
@@ -54,6 +92,22 @@ export default function KayitlarTab() {
     load()
   }
 
+  async function handleCreateBracket() {
+    if (list.length < 2) { setBracketMsg('❌ En az 2 katılımcı gerekli.'); setTimeout(() => setBracketMsg(''), 3000); return }
+    if (!window.confirm(`${list.length} oyuncuyla bracket oluşturulsun mu?`)) return
+    const bracket = buildBracket(list.map(r => r.lol_nick))
+    await saveBracket(bracket)
+    setBracketMsg('✅ Bracket oluşturuldu!')
+    setTimeout(() => setBracketMsg(''), 3000)
+  }
+
+  async function handleClearBracket() {
+    if (!window.confirm('Bracket silinsin mi?')) return
+    await saveBracket(null)
+    setBracketMsg('✅ Bracket silindi.')
+    setTimeout(() => setBracketMsg(''), 3000)
+  }
+
   function exportList(mode) {
     if (!list.length) { alert('Kayıt yok.'); return }
     let txt
@@ -90,9 +144,9 @@ export default function KayitlarTab() {
         <div className={styles.kayitCount}>{list.length} kayıt</div>
 
         <div className={styles.exportRow}>
-          <button className={styles.expBtn} onClick={() => exportList('kick')}>📋 Kick Nickler</button>
-          <button className={styles.expBtn} onClick={() => exportList('lol')}>📋 LoL Nickler</button>
-          <button className={styles.expBtn} onClick={() => exportList('both')}>📋 İkisi Birden</button>
+          <button className={styles.expBtn} onClick={() => exportList('kick')}>📋 Kick</button>
+          <button className={styles.expBtn} onClick={() => exportList('lol')}>📋 LoL</button>
+          <button className={styles.expBtn} onClick={() => exportList('both')}>📋 İkisi</button>
           <button className={`${styles.expBtn} ${styles.expBtnDanger}`} onClick={handleClearAll}>🗑️ Tümünü Sil</button>
         </div>
 
@@ -108,6 +162,23 @@ export default function KayitlarTab() {
             ))
           }
         </div>
+      </div>
+
+      {/* Bracket */}
+      <div className={styles.card}>
+        <div className={styles.cardTitle}>🏆 Turnuva Bracket</div>
+        <p style={{ fontSize: '0.82rem', color: 'rgba(212,245,192,0.5)', marginBottom: '0.8rem' }}>
+          LoL nickleri kullanılarak tekli eleme bracket'ı oluşturulur. Bye'lar otomatik hesaplanır.
+        </p>
+        <div style={{ display: 'flex', gap: '0.6rem' }}>
+          <button className={styles.btnGreen} onClick={handleCreateBracket} style={{ flex: 1 }}>
+            🎲 Bracket Oluştur
+          </button>
+          <button className={styles.btnOutline} onClick={handleClearBracket} style={{ flex: 1 }}>
+            🗑️ Bracket Temizle
+          </button>
+        </div>
+        {bracketMsg && <div className={styles.sucMsg}>{bracketMsg}</div>}
       </div>
 
       {/* Export */}

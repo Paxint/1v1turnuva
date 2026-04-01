@@ -155,6 +155,19 @@ export function subscribeToTable(table, callback) {
   return () => supabase.removeChannel(channel)
 }
 
+// ─── Bracket ─────────────────────────────────────────────────────────────────
+
+export async function getBracket() {
+  const val = await getSetting('global', 'bracket')
+  if (!val) return null
+  try { return JSON.parse(val) } catch { return null }
+}
+
+export async function saveBracket(data) {
+  if (data === null) return deleteSetting('global', 'bracket')
+  return setSetting('global', 'bracket', JSON.stringify(data))
+}
+
 // ─── Storage ─────────────────────────────────────────────────────────────────
 
 export async function uploadImage(path, file) {
