@@ -6,7 +6,7 @@ import styles from './Home.module.css'
 
 export default function Home() {
   const { theme } = useTheme()
-  const [badge, setBadge] = useState('🐍 Sadece Kick\'te — Her Pazar 20:30')
+  const [badge, setBadge] = useState('Sadece Kick\'te — Her Pazar 20:30')
   const [followUrl, setFollowUrl] = useState('https://kick.com/paxint')
   const [posterSrc, setPosterSrc] = useState(null)
   const [imgError, setImgError] = useState(false)
@@ -18,10 +18,8 @@ export default function Home() {
         getSetting(theme, 'follow_url'),
         getSetting(theme, 'poster_url'),
       ])
-      if (b) setBadge(b)
-      else setBadge('🐍 Sadece Kick\'te — Her Pazar 20:30')
-      if (f) setFollowUrl(f)
-      else setFollowUrl('https://kick.com/paxint')
+      setBadge(b || 'Sadece Kick\'te — Her Pazar 20:30')
+      setFollowUrl(f || 'https://kick.com/paxint')
       setImgError(false)
       setPosterSrc(p || null)
     }
@@ -30,20 +28,36 @@ export default function Home() {
 
   return (
     <section className={styles.hero}>
-      <div className={`${styles.heroBadge} fade-up`}>{badge}</div>
+      {/* Decorative lines */}
+      <div className={styles.decoL} aria-hidden />
+      <div className={styles.decoR} aria-hidden />
 
+      {/* Live badge */}
+      <div className={`${styles.heroBadge} fade-up`}>
+        <span className={styles.liveDot} />
+        {badge}
+      </div>
+
+      {/* Poster */}
       {posterSrc && !imgError && (
-        <div className={`${styles.posterWrap} fade-up-1`}>
-          <img
-            key={posterSrc}
-            className={styles.poster}
-            src={posterSrc}
-            alt="Turnuva Posteri"
-            onError={() => setImgError(true)}
-          />
+        <div className={`${styles.posterFrame} fade-up-1`}>
+          <div className={styles.posterInner}>
+            <span className={styles.cornerTL} aria-hidden />
+            <span className={styles.cornerTR} aria-hidden />
+            <span className={styles.cornerBL} aria-hidden />
+            <span className={styles.cornerBR} aria-hidden />
+            <img
+              key={posterSrc}
+              className={styles.poster}
+              src={posterSrc}
+              alt="Turnuva Posteri"
+              onError={() => setImgError(true)}
+            />
+          </div>
         </div>
       )}
 
+      {/* CTA buttons */}
       <div className={`${styles.heroCta} fade-up-2`}>
         <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
           Kick'te Takip Et

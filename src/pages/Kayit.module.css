@@ -1,113 +1,133 @@
 .page {
-  position: relative;
-  z-index: 1;
-  max-width: 520px;
-  margin: 0 auto;
-  padding: 3rem 1.5rem 5rem;
+  position: relative; z-index: 1;
+  max-width: 520px; margin: 0 auto;
+  padding: 3.5rem 1.5rem 5rem;
 }
 
-.pageHeader {
-  text-align: center;
-  margin-bottom: 2.5rem;
-}
+/* ─── Header ─── */
+.pageHeader { text-align: center; margin-bottom: 2.5rem; }
 
 .pageTag {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 0.72rem;
-  letter-spacing: 0.28em;
-  text-transform: uppercase;
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.7rem; letter-spacing: 0.32em; text-transform: uppercase;
   color: var(--green);
-  background: rgba(83, 252, 24, 0.08);
-  border: 1px solid rgba(83, 252, 24, 0.25);
-  padding: 0.3rem 0.9rem;
-  border-radius: 2px;
-  display: inline-block;
+  background: rgba(83,252,24,0.06); border: 1px solid rgba(83,252,24,0.2);
+  padding: 0.32rem 1rem; border-radius: 1px;
 }
 
 .pageHeader h1 {
   font-family: 'Bebas Neue', cursive;
-  font-size: 2.8rem;
-  letter-spacing: 0.06em;
-  margin-top: 0.8rem;
-  line-height: 1;
-  color: #fff;
+  font-size: 3.2rem; letter-spacing: 0.06em;
+  margin-top: 0.8rem; line-height: 1; color: #fff;
 }
-
 .pageHeader h1 span {
   color: var(--green);
-  text-shadow: 0 0 30px var(--green-glow);
+  text-shadow: 0 0 30px var(--green-glow), 0 0 60px rgba(83,252,24,0.15);
+  animation: glow-pulse 3s ease-in-out infinite;
 }
 
+/* ─── Form card ─── */
 .formCard {
+  position: relative;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 2rem;
+  border-radius: 3px; padding: 2.2rem;
+  box-shadow: 0 0 40px rgba(0,0,0,0.4), inset 0 1px 0 rgba(83,252,24,0.05);
+  overflow: hidden;
 }
 
-.field { margin-bottom: 1.2rem; }
+/* Animated top bar */
+.formCard::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+  background-size: 200% 100%;
+  animation: border-flow 3s ease infinite;
+}
+
+/* Corner accents */
+.formCard::after {
+  content: '';
+  position: absolute; top: 0; right: 0;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle at top right, rgba(83,252,24,0.06), transparent 70%);
+  pointer-events: none;
+}
+
+/* ─── Fields ─── */
+.field { margin-bottom: 1.3rem; position: relative; }
 
 .field label {
-  display: block;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 0.78rem;
-  letter-spacing: 0.18em;
-  text-transform: uppercase;
-  color: rgba(212, 245, 192, 0.5);
-  margin-bottom: 0.4rem;
+  display: flex; align-items: center; gap: 0.4rem;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 0.76rem; letter-spacing: 0.2em; text-transform: uppercase;
+  color: rgba(212,245,192,0.45); margin-bottom: 0.45rem;
+  transition: color 0.2s;
+}
+.field:focus-within label { color: var(--green); }
+
+.field label .labelIcon { font-size: 0.9rem; }
+
+/* Custom input override */
+.field :global(.ipt) {
+  border-radius: 2px;
+  transition: border-color 0.25s, box-shadow 0.25s, background 0.25s;
 }
 
 .err {
-  font-size: 0.8rem;
-  color: var(--red);
-  margin-top: 0.3rem;
+  font-size: 0.8rem; color: var(--red);
+  margin-top: 0.35rem;
+  display: flex; align-items: center; gap: 0.3rem;
+  animation: fadeUp 0.3s ease both;
 }
 
+/* ─── Submit btn ─── */
 .submitBtn {
   width: 100%;
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  font-size: 1rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  padding: 0.8rem 2rem;
-  background: var(--green);
-  color: var(--black);
-  border: none;
-  border-radius: 3px;
-  cursor: pointer;
-  box-shadow: 0 0 20px var(--green-glow);
-  transition: filter 0.2s, opacity 0.2s;
-  margin-top: 0.5rem;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 700;
+  font-size: 1rem; letter-spacing: 0.18em; text-transform: uppercase;
+  padding: 0.9rem 2rem;
+  background: var(--green); color: var(--black);
+  border: none; border-radius: 2px; cursor: pointer;
+  box-shadow: 0 0 20px var(--green-glow), 0 4px 15px rgba(0,0,0,0.3);
+  transition: filter 0.2s, box-shadow 0.2s, transform 0.2s;
+  margin-top: 0.7rem; position: relative; overflow: hidden;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
 }
-
-.submitBtn:hover:not(:disabled) { filter: brightness(1.1); }
-
-.submitBtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-  box-shadow: none;
+.submitBtn::after {
+  content: '';
+  position: absolute; top: 0; left: -60%;
+  width: 40%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transform: skewX(-20deg);
 }
+.submitBtn:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 35px var(--green-glow), 0 6px 25px rgba(0,0,0,0.4);
+  transform: translateY(-1px);
+}
+.submitBtn:hover:not(:disabled)::after { animation: scan-sweep 0.6s ease; }
+.submitBtn:disabled { opacity: 0.3; cursor: not-allowed; box-shadow: none; }
 
+/* ─── Success ─── */
 .successBox {
-  margin-top: 1rem;
-  background: rgba(83, 252, 24, 0.08);
-  border: 1px solid rgba(83, 252, 24, 0.3);
-  border-radius: 4px;
-  padding: 1rem 1.2rem;
+  margin-top: 1.2rem;
+  background: rgba(83,252,24,0.07);
+  border: 1px solid rgba(83,252,24,0.3);
+  border-left: 3px solid var(--green);
+  border-radius: 2px; padding: 1rem 1.2rem;
   text-align: center;
+  animation: fadeUp 0.4s cubic-bezier(0.16,1,0.3,1) both;
+  box-shadow: 0 0 20px rgba(83,252,24,0.06);
 }
-
 .successBox p {
-  font-size: 0.9rem;
-  color: var(--green);
+  font-size: 0.9rem; color: var(--green);
   font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700;
-  letter-spacing: 0.1em;
+  font-weight: 700; letter-spacing: 0.12em;
 }
 
 @media (max-width: 600px) {
   .page { padding: 2rem 1rem 4rem; }
+  .formCard { padding: 1.6rem; }
 }
