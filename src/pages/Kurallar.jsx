@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTheme } from '../context/ThemeContext'
-import { getRules } from '../lib/supabase'
+import { getRules, subscribeToTable } from '../lib/supabase'
 import styles from './Kurallar.module.css'
 
 const DEFAULT_RULES = [
@@ -34,14 +34,17 @@ export default function Kurallar() {
   const { theme } = useTheme()
   const [rules, setRules] = useState(DEFAULT_RULES)
 
-  useEffect(() => {
-    async function load() {
-      const rows = await getRules(theme)
-      if (rows.length > 0) setRules(rows)
-      else setRules(DEFAULT_RULES)
-    }
-    load()
+  const load = useCallback(async () => {
+    const rows = await getRules(theme)
+    if (rows.length > 0) setRules(rows)
+    else setRules(DEFAULT_RULES)
   }, [theme])
+
+  useEffect(() => {
+    load()
+    const unsub = subscribeToTable('rules', load)
+    return unsub
+  }, [load])
 
   return (
     <div className={styles.page}>

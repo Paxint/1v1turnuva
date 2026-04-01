@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
-import { getSetting } from '../lib/supabase'
+import { getSetting, subscribeToTable } from '../lib/supabase'
 import styles from './Home.module.css'
 
 export default function Home() {
@@ -11,20 +11,23 @@ export default function Home() {
   const [posterSrc, setPosterSrc] = useState(null)
   const [imgError, setImgError] = useState(false)
 
-  useEffect(() => {
-    async function load() {
-      const [b, f, p] = await Promise.all([
-        getSetting(theme, 'badge'),
-        getSetting(theme, 'follow_url'),
-        getSetting(theme, 'poster_url'),
-      ])
-      setBadge(b || 'Sadece Kick\'te — Her Pazar 20:30')
-      setFollowUrl(f || 'https://kick.com/paxint')
-      setImgError(false)
-      setPosterSrc(p || null)
-    }
-    load()
+  const load = useCallback(async () => {
+    const [b, f, p] = await Promise.all([
+      getSetting(theme, 'badge'),
+      getSetting(theme, 'follow_url'),
+      getSetting(theme, 'poster_url'),
+    ])
+    setBadge(b || 'Sadece Kick\'te — Her Pazar 20:30')
+    setFollowUrl(f || 'https://kick.com/paxint')
+    setImgError(false)
+    setPosterSrc(p || null)
   }, [theme])
+
+  useEffect(() => {
+    load()
+    const unsub = subscribeToTable('settings', load)
+    return unsub
+  }, [load])
 
   return (
     <section className={styles.hero}>

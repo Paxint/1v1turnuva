@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useTheme } from '../context/ThemeContext'
-import { getBroadcasters } from '../lib/supabase'
+import { getBroadcasters, subscribeToTable } from '../lib/supabase'
 import HoverEffect from '../components/HoverEffect'
 import styles from './Yayincilar.module.css'
 
@@ -16,14 +16,17 @@ export default function Yayincilar() {
   const [hoveredEffect, setHoveredEffect] = useState('none')
   const [isHovering, setIsHovering] = useState(false)
 
-  useEffect(() => {
-    async function load() {
-      const rows = await getBroadcasters(theme)
-      if (rows.length > 0) setBroadcasters(rows)
-      else setBroadcasters(DEFAULT_BROADCASTERS)
-    }
-    load()
+  const load = useCallback(async () => {
+    const rows = await getBroadcasters(theme)
+    if (rows.length > 0) setBroadcasters(rows)
+    else setBroadcasters(DEFAULT_BROADCASTERS)
   }, [theme])
+
+  useEffect(() => {
+    load()
+    const unsub = subscribeToTable('broadcasters', load)
+    return unsub
+  }, [load])
 
   function handleEnter(effect) {
     setHoveredEffect(effect || 'none')

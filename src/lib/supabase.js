@@ -144,6 +144,17 @@ export async function clearRegistrations() {
   logErr('clearRegistrations', error)
 }
 
+// ─── Realtime ────────────────────────────────────────────────────────────────
+
+export function subscribeToTable(table, callback) {
+  if (!isConfigured) return () => {}
+  const channel = supabase
+    .channel(`realtime:${table}:${Math.random()}`)
+    .on('postgres_changes', { event: '*', schema: 'public', table }, callback)
+    .subscribe()
+  return () => supabase.removeChannel(channel)
+}
+
 // ─── Storage ─────────────────────────────────────────────────────────────────
 
 export async function uploadImage(path, file) {
