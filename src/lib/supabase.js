@@ -57,6 +57,21 @@ export async function upsertBroadcaster(row) {
     .upsert(row, { onConflict: 'broadcaster_key,sort_order' })
 }
 
+export async function saveBroadcasters(broadcasterKey, list) {
+  if (!isConfigured) return
+  await supabase.from('broadcasters').delete().eq('broadcaster_key', broadcasterKey)
+  if (list.length === 0) return
+  await supabase.from('broadcasters').insert(
+    list.map((b, i) => ({
+      broadcaster_key: broadcasterKey,
+      sort_order: i,
+      name: b.name,
+      subtitle: b.subtitle,
+      image_url: b.image_url || '',
+    }))
+  )
+}
+
 // ─── Rules ───────────────────────────────────────────────────────────────────
 
 export async function getRules(broadcaster) {

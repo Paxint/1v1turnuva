@@ -1,30 +1,11 @@
 import { useEffect, useState } from 'react'
-import { getBroadcasters, upsertBroadcaster, uploadImage } from '../../../lib/supabase'
+import { getBroadcasters, saveBroadcasters, uploadImage } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
-const DEFAULT_NAMES = ['Paxint', 'Rakuexe27', 'Redjangu']
-
-function compressImage(dataUrl) {
-  return new Promise(resolve => {
-    const img = new Image()
-    img.onload = () => {
-      const MAX = 480
-      let w = img.width, h = img.height
-      if (w > MAX) { h = Math.round(h * MAX / w); w = MAX }
-      if (h > MAX * 1.5) { w = Math.round(w * (MAX * 1.5) / h); h = Math.round(MAX * 1.5) }
-      const canvas = document.createElement('canvas')
-      canvas.width = w; canvas.height = h
-      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
-      resolve(canvas.toDataURL('image/jpeg', 0.75))
-    }
-    img.src = dataUrl
-  })
-}
+const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '' }
 
 export default function YayincilarTab({ theme }) {
-  const [yayincilar, setYayincilar] = useState(
-    DEFAULT_NAMES.map((name, i) => ({ name, subtitle: 'Yayıncı', image_url: '', sort_order: i }))
-  )
+  const [yayincilar, setYayincilar] = useState([])
   const [sucMsg, setSucMsg] = useState('')
   const [errMsg, setErrMsg] = useState('')
   const [uploading, setUploading] = useState(null)
@@ -33,9 +14,13 @@ export default function YayincilarTab({ theme }) {
     async function load() {
       const rows = await getBroadcasters(theme)
       if (rows.length > 0) {
-        setYayincilar(rows)
+        setYayincilar(rows.map(r => ({ name: r.name, subtitle: r.subtitle, image_url: r.image_url })))
       } else {
-        setYayincilar(DEFAULT_NAMES.map((name, i) => ({ name, subtitle: 'Yayıncı', image_url: '', sort_order: i })))
+        setYayincilar([
+          { name: 'Paxint',    subtitle: 'Yayıncı', image_url: '' },
+          { name: 'Rakuexe27', subtitle: 'Yayıncı', image_url: '' },
+          { name: 'Redjangu',  subtitle: 'Yayıncı', image_url: '' },
+        ])
       }
     }
     load()
@@ -43,6 +28,15 @@ export default function YayincilarTab({ theme }) {
 
   function update(index, field, value) {
     setYayincilar(prev => prev.map((y, i) => i === index ? { ...y, [field]: value } : y))
+  }
+
+  function addCard() {
+    setYayincilar(prev => [...prev, { ...EMPTY_BROADCASTER }])
+  }
+
+  function removeCard(index) {
+    if (yayincilar.length <= 1) return
+    setYayincilar(prev => prev.filter((_, i) => i !== index))
   }
 
   async function handleFile(index, file) {
@@ -63,15 +57,11 @@ export default function YayincilarTab({ theme }) {
   async function save() {
     setErrMsg('')
     try {
-      await Promise.all(
-        yayincilar.map(y =>
-          upsertBroadcaster({ broadcaster_key: theme, name: y.name, subtitle: y.subtitle, image_url: y.image_url, sort_order: y.sort_order })
-        )
-      )
+      await saveBroadcasters(theme, yayincilar)
       setSucMsg('✅ Kaydedildi!')
       setTimeout(() => setSucMsg(''), 3000)
     } catch {
-      setErrMsg('❌ Kayıt hatası. Görsel çok büyük olabilir.')
+      setErrMsg('❌ Kayıt hatası.')
       setTimeout(() => setErrMsg(''), 4000)
     }
   }
@@ -83,8 +73,18 @@ export default function YayincilarTab({ theme }) {
       <div className={styles.yayinciGrid}>
         {yayincilar.map((y, i) => (
           <div key={i} className={styles.yc}>
-            <div className={styles.ycNum}>{i + 1}</div>
+            {/* Numara + Sil butonu */}
+            <div className={styles.ycHeader}>
+              <span className={styles.ycNum}>{i + 1}</span>
+              <button
+                className={styles.ycRemoveBtn}
+                onClick={() => removeCard(i)}
+                title="Kartı sil"
+                disabled={yayincilar.length <= 1}
+              >✕</button>
+            </div>
 
+            {/* Görsel yükleme */}
             <label className={styles.ycUpload}>
               {uploading === i
                 ? <div className={styles.ycPlaceholder}>⏳</div>
@@ -100,7 +100,8 @@ export default function YayincilarTab({ theme }) {
               />
             </label>
 
-            <div className={styles.ycBtn} onClick={e => e.currentTarget.previousSibling?.querySelector('input')?.click?.()}>
+            <div className={styles.ycBtn}
+              onClick={e => e.currentTarget.previousSibling?.querySelector('input')?.click?.()}>
               📁 Fotoğraf Seç
             </div>
 
@@ -123,9 +124,15 @@ export default function YayincilarTab({ theme }) {
         ))}
       </div>
 
+      {/* + Kart Ekle */}
+      <button className={styles.addCardBtn} onClick={addCard}>
+        ＋ Yayıncı Ekle
+      </button>
+
       <div style={{ marginTop: '1rem' }}>
         <button className={styles.btnGreen} onClick={save}>💾 Yayıncıları Kaydet</button>
       </div>
+
       {sucMsg && <div className={styles.sucMsg}>{sucMsg}</div>}
       {errMsg && <div className={styles.errMsg}>{errMsg}</div>}
     </div>
