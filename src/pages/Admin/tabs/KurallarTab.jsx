@@ -12,13 +12,16 @@ const DEFAULT_RULES = [
 
 export default function KurallarTab({ theme }) {
   const [rules, setRules] = useState(DEFAULT_RULES)
+  // Raw textarea values — not trimmed, so typing spaces works
+  const [rawTexts, setRawTexts] = useState(() => DEFAULT_RULES.map(r => r.items.join('\n')))
   const [sucMsg, setSucMsg] = useState('')
 
   useEffect(() => {
     async function load() {
       const rows = await getRules(theme)
-      if (rows.length > 0) setRules(rows)
-      else setRules(DEFAULT_RULES)
+      const data = rows.length > 0 ? rows : DEFAULT_RULES
+      setRules(data)
+      setRawTexts(data.map(r => r.items.join('\n')))
     }
     load()
   }, [theme])
@@ -28,12 +31,16 @@ export default function KurallarTab({ theme }) {
   }
 
   function updateItems(i, text) {
-    const items = text.split('\n').map(l => l.trim()).filter(Boolean)
-    setRules(prev => prev.map((r, idx) => idx === i ? { ...r, items } : r))
+    setRawTexts(prev => prev.map((t, idx) => idx === i ? text : t))
   }
 
   async function handleSave() {
-    await saveRules(theme, rules)
+    // Trim and filter only on save
+    const finalRules = rules.map((r, i) => ({
+      ...r,
+      items: (rawTexts[i] || '').split('\n').map(l => l.trim()).filter(Boolean),
+    }))
+    await saveRules(theme, finalRules)
     setSucMsg('✅ Kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
   }
@@ -61,7 +68,7 @@ export default function KurallarTab({ theme }) {
               <textarea
                 className="ipt"
                 placeholder="Her maddeyi ayrı satıra..."
-                value={rule.items.join('\n')}
+                value={rawTexts[i] ?? rule.items.join('\n')}
                 onChange={e => updateItems(i, e.target.value)}
                 style={{ resize: 'vertical', minHeight: 80, lineHeight: 1.6 }}
               />
