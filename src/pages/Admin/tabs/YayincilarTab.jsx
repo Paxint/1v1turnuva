@@ -5,13 +5,26 @@ import styles from './Tabs.module.css'
 const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '', effect: 'none' }
 
 const EFFECT_OPTIONS = [
-  { value: 'none',      label: '⭕ Efekt Yok'  },
-  { value: 'fire',      label: '🔥 Ateş'       },
-  { value: 'ice',       label: '❄️ Buz'         },
-  { value: 'lightning', label: '⚡ Şimşek'      },
-  { value: 'poison',    label: '🐍 Zehir'       },
-  { value: 'dark',      label: '💀 Karanlık'    },
-  { value: 'blood',     label: '🩸 Kan'         },
+  { value: 'none',      label: '⭕ Efekt Yok'   },
+  { value: 'fire',      label: '🔥 Ateş'        },
+  { value: 'water',     label: '💧 Su'           },
+  { value: 'grass',     label: '🌿 Çimen'        },
+  { value: 'ice',       label: '❄️ Buz'          },
+  { value: 'lightning', label: '⚡ Elektrik'     },
+  { value: 'fighting',  label: '👊 Dövüş'        },
+  { value: 'poison',    label: '☠️ Zehir'        },
+  { value: 'ground',    label: '🌍 Toprak'       },
+  { value: 'flying',    label: '🌀 Uçuş'         },
+  { value: 'psychic',   label: '🔮 Psişik'       },
+  { value: 'bug',       label: '🐛 Böcek'        },
+  { value: 'rock',      label: '🪨 Kaya'         },
+  { value: 'ghost',     label: '👻 Hayalet'      },
+  { value: 'dragon',    label: '🐉 Ejderha'      },
+  { value: 'dark',      label: '🌑 Karanlık'     },
+  { value: 'steel',     label: '⚙️ Çelik'        },
+  { value: 'fairy',     label: '🌸 Peri'         },
+  { value: 'normal',    label: '⬜ Normal'        },
+  { value: 'blood',     label: '🩸 Kan'          },
 ]
 
 export default function YayincilarTab({ theme }) {
