@@ -54,12 +54,22 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   overflow: hidden;
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 0.35s ease,
+              border-color 0.35s ease;
+  position: relative;
+  z-index: 60;
+  will-change: transform;
 }
 
 .card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 0 30px var(--green-glow);
+  transform: scale(1.08) translateY(-8px) translateZ(0);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.6),
+    0 0 40px var(--green-glow),
+    0 0 80px var(--green-glow);
+  border-color: var(--green);
+  z-index: 61;
 }
 
 .cardImgWrap {
@@ -75,10 +85,10 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.3s;
+  transition: transform 0.4s ease;
 }
 
-.card:hover .cardImg { transform: scale(1.04); }
+.card:hover .cardImg { transform: scale(1.06); }
 
 .cardImgPlaceholder {
   width: 100%;
