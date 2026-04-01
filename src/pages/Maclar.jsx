@@ -32,8 +32,8 @@ function clearWinner(rounds, rIdx, mIdx) {
 function MatchCard({ match, onSelect, onClear }) {
   const isBye = match.p1 && !match.p2
   const hasWinner = !!match.winner
-  const p1win = match.winner === match.p1
-  const p2win = match.winner === match.p2
+  const p1win = !!match.winner && match.winner === match.p1
+  const p2win = !!match.winner && match.winner === match.p2
   // Can click a player if: they exist AND (no winner yet OR they're NOT already the winner)
   const p1clickable = !!match.p1 && (!hasWinner || p2win)
   const p2clickable = (!!match.p2 || isBye) && (!hasWinner || p1win)
