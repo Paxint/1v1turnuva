@@ -1,17 +1,20 @@
 import { useEffect, useState } from 'react'
 import { useTheme } from '../context/ThemeContext'
 import { getBroadcasters } from '../lib/supabase'
+import HoverEffect from '../components/HoverEffect'
 import styles from './Yayincilar.module.css'
 
 const DEFAULT_BROADCASTERS = [
-  { name: 'Paxint',     subtitle: 'Yayıncı', image_url: '', sort_order: 0 },
-  { name: 'Rakuexe27',  subtitle: 'Yayıncı', image_url: '', sort_order: 1 },
-  { name: 'Redjangu',   subtitle: 'Yayıncı', image_url: '', sort_order: 2 },
+  { name: 'Paxint',    subtitle: 'Yayıncı', image_url: '', sort_order: 0, effect: 'none' },
+  { name: 'Rakuexe27', subtitle: 'Yayıncı', image_url: '', sort_order: 1, effect: 'none' },
+  { name: 'Redjangu',  subtitle: 'Yayıncı', image_url: '', sort_order: 2, effect: 'none' },
 ]
 
 export default function Yayincilar() {
   const { theme } = useTheme()
   const [broadcasters, setBroadcasters] = useState(DEFAULT_BROADCASTERS)
+  const [hoveredEffect, setHoveredEffect] = useState('none')
+  const [isHovering, setIsHovering] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -22,6 +25,15 @@ export default function Yayincilar() {
     load()
   }, [theme])
 
+  function handleEnter(effect) {
+    setHoveredEffect(effect || 'none')
+    setIsHovering(true)
+  }
+
+  function handleLeave() {
+    setIsHovering(false)
+  }
+
   return (
     <div className={styles.page}>
       <div className={`${styles.pageHeader} fade-up`}>
@@ -31,7 +43,12 @@ export default function Yayincilar() {
 
       <div className={`${styles.cards} fade-up-1`}>
         {broadcasters.map((b, i) => (
-          <div className={styles.card} key={i}>
+          <div
+            className={styles.card}
+            key={i}
+            onMouseEnter={() => handleEnter(b.effect)}
+            onMouseLeave={handleLeave}
+          >
             <div className={styles.cardImgWrap}>
               {b.image_url
                 ? <img className={styles.cardImg} src={b.image_url} alt={b.name} />
@@ -45,6 +62,8 @@ export default function Yayincilar() {
           </div>
         ))}
       </div>
+
+      <HoverEffect effect={hoveredEffect} active={isHovering} />
     </div>
   )
 }

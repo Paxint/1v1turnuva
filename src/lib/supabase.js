@@ -68,6 +68,7 @@ export async function saveBroadcasters(broadcasterKey, list) {
       name: b.name,
       subtitle: b.subtitle,
       image_url: b.image_url || '',
+      effect: b.effect || 'none',
     }))
   )
 }

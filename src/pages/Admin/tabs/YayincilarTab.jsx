@@ -2,7 +2,17 @@ import { useEffect, useState } from 'react'
 import { getBroadcasters, saveBroadcasters, uploadImage } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
-const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '' }
+const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '', effect: 'none' }
+
+const EFFECT_OPTIONS = [
+  { value: 'none',      label: '⭕ Efekt Yok'  },
+  { value: 'fire',      label: '🔥 Ateş'       },
+  { value: 'ice',       label: '❄️ Buz'         },
+  { value: 'lightning', label: '⚡ Şimşek'      },
+  { value: 'poison',    label: '🐍 Zehir'       },
+  { value: 'dark',      label: '💀 Karanlık'    },
+  { value: 'blood',     label: '🩸 Kan'         },
+]
 
 export default function YayincilarTab({ theme }) {
   const [yayincilar, setYayincilar] = useState([])
@@ -14,12 +24,12 @@ export default function YayincilarTab({ theme }) {
     async function load() {
       const rows = await getBroadcasters(theme)
       if (rows.length > 0) {
-        setYayincilar(rows.map(r => ({ name: r.name, subtitle: r.subtitle, image_url: r.image_url })))
+        setYayincilar(rows.map(r => ({ name: r.name, subtitle: r.subtitle, image_url: r.image_url, effect: r.effect || 'none' })))
       } else {
         setYayincilar([
-          { name: 'Paxint',    subtitle: 'Yayıncı', image_url: '' },
-          { name: 'Rakuexe27', subtitle: 'Yayıncı', image_url: '' },
-          { name: 'Redjangu',  subtitle: 'Yayıncı', image_url: '' },
+          { name: 'Paxint',    subtitle: 'Yayıncı', image_url: '', effect: 'none' },
+          { name: 'Rakuexe27', subtitle: 'Yayıncı', image_url: '', effect: 'none' },
+          { name: 'Redjangu',  subtitle: 'Yayıncı', image_url: '', effect: 'none' },
         ])
       }
     }
@@ -120,6 +130,15 @@ export default function YayincilarTab({ theme }) {
               onChange={e => update(i, 'subtitle', e.target.value)}
               style={{ marginTop: '0.4rem' }}
             />
+            <select
+              className={styles.effectSelect}
+              value={y.effect || 'none'}
+              onChange={e => update(i, 'effect', e.target.value)}
+            >
+              {EFFECT_OPTIONS.map(o => (
+                <option key={o.value} value={o.value}>{o.label}</option>
+              ))}
+            </select>
           </div>
         ))}
       </div>
