@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getBroadcasters, upsertBroadcaster } from '../../../lib/supabase'
+import { getBroadcasters, upsertBroadcaster, uploadImage } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 const DEFAULT_NAMES = ['Paxint', 'Rakuexe27', 'Redjangu']
@@ -27,6 +27,7 @@ export default function YayincilarTab({ theme }) {
   )
   const [sucMsg, setSucMsg] = useState('')
   const [errMsg, setErrMsg] = useState('')
+  const [uploading, setUploading] = useState(null)
 
   useEffect(() => {
     async function load() {
@@ -46,12 +47,17 @@ export default function YayincilarTab({ theme }) {
 
   async function handleFile(index, file) {
     if (!file) return
-    const reader = new FileReader()
-    reader.onload = async e => {
-      const compressed = await compressImage(e.target.result)
-      update(index, 'image_url', compressed)
+    setUploading(index)
+    try {
+      const ext = file.name.split('.').pop() || 'jpg'
+      const publicUrl = await uploadImage(`broadcasters/${theme}_${index}.${ext}`, file)
+      update(index, 'image_url', publicUrl)
+    } catch (err) {
+      setErrMsg('❌ Yükleme hatası: ' + err.message)
+      setTimeout(() => setErrMsg(''), 4000)
+    } finally {
+      setUploading(null)
     }
-    reader.readAsDataURL(file)
   }
 
   async function save() {
@@ -80,9 +86,11 @@ export default function YayincilarTab({ theme }) {
             <div className={styles.ycNum}>{i + 1}</div>
 
             <label className={styles.ycUpload}>
-              {y.image_url
-                ? <img src={y.image_url} alt={y.name} className={styles.ycImg} />
-                : <div className={styles.ycPlaceholder}>🎮</div>
+              {uploading === i
+                ? <div className={styles.ycPlaceholder}>⏳</div>
+                : y.image_url
+                  ? <img src={y.image_url} alt={y.name} className={styles.ycImg} />
+                  : <div className={styles.ycPlaceholder}>🎮</div>
               }
               <input
                 type="file"

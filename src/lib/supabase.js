@@ -117,3 +117,17 @@ export async function clearRegistrations() {
   if (!isConfigured) return
   await supabase.from('registrations').delete().neq('id', 0)
 }
+
+// ─── Storage ─────────────────────────────────────────────────────────────────
+
+export async function uploadImage(path, file) {
+  if (!isConfigured) return null
+  const { data, error } = await supabase.storage
+    .from('images')
+    .upload(path, file, { upsert: true, contentType: file.type })
+  if (error) throw error
+  const { data: { publicUrl } } = supabase.storage
+    .from('images')
+    .getPublicUrl(data.path)
+  return publicUrl
+}

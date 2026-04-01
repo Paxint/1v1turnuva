@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getSetting, setSetting, deleteSetting } from '../../../lib/supabase'
+import { getSetting, setSetting, deleteSetting, uploadImage } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 export default function PosterlerTab({ theme }) {
@@ -24,24 +24,21 @@ export default function PosterlerTab({ theme }) {
     setTimeout(() => setSucMsg(''), 3000)
   }
 
-  function handleFile(file) {
+  const [uploading, setUploading] = useState(false)
+
+  async function handleFile(file) {
     if (!file || !file.type.startsWith('image/')) return
-    const reader = new FileReader()
-    reader.onload = e => {
-      // Compress via canvas
-      const img = new Image()
-      img.onload = () => {
-        const canvas = document.createElement('canvas')
-        let w = img.width, h = img.height
-        const MAX = 800
-        if (w > MAX) { h = Math.round(h * MAX / w); w = MAX }
-        canvas.width = w; canvas.height = h
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h)
-        savePoster(canvas.toDataURL('image/jpeg', 0.8))
-      }
-      img.src = e.target.result
+    setUploading(true)
+    try {
+      const ext = file.name.split('.').pop() || 'jpg'
+      const publicUrl = await uploadImage(`posters/${theme}.${ext}`, file)
+      await savePoster(publicUrl)
+    } catch (err) {
+      setSucMsg('❌ Yükleme hatası: ' + err.message)
+      setTimeout(() => setSucMsg(''), 4000)
+    } finally {
+      setUploading(false)
     }
-    reader.readAsDataURL(file)
   }
 
   async function resetPoster() {
@@ -81,7 +78,7 @@ export default function PosterlerTab({ theme }) {
           onChange={e => handleFile(e.target.files[0])}
         />
         <div className={styles.uzIcon}>📁</div>
-        <p>Tıkla veya sürükle — <strong>PNG, JPG, WEBP</strong></p>
+        <p>{uploading ? '⏳ Yükleniyor...' : <>Tıkla veya sürükle — <strong>PNG, JPG, WEBP</strong></>}</p>
       </div>
 
       <div className={styles.orDiv}>VEYA</div>
