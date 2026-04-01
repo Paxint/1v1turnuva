@@ -8,7 +8,8 @@ export default function Home() {
   const { theme } = useTheme()
   const [badge, setBadge] = useState('🐍 Sadece Kick\'te — Her Pazar 20:30')
   const [followUrl, setFollowUrl] = useState('https://kick.com/paxint')
-  const [posterSrc, setPosterSrc] = useState('/poster.png')
+  const [posterSrc, setPosterSrc] = useState(null)
+  const [imgError, setImgError] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -21,8 +22,8 @@ export default function Home() {
       else setBadge('🐍 Sadece Kick\'te — Her Pazar 20:30')
       if (f) setFollowUrl(f)
       else setFollowUrl('https://kick.com/paxint')
-      if (p) setPosterSrc(p)
-      else setPosterSrc('/poster.png')
+      setImgError(false)
+      setPosterSrc(p || null)
     }
     load()
   }, [theme])
@@ -31,14 +32,17 @@ export default function Home() {
     <section className={styles.hero}>
       <div className={`${styles.heroBadge} fade-up`}>{badge}</div>
 
-      <div className={`${styles.posterWrap} fade-up-1`}>
-        <img
-          className={styles.poster}
-          src={posterSrc}
-          alt="Turnuva Posteri"
-          onError={e => { e.currentTarget.style.display = 'none' }}
-        />
-      </div>
+      {posterSrc && !imgError && (
+        <div className={`${styles.posterWrap} fade-up-1`}>
+          <img
+            key={posterSrc}
+            className={styles.poster}
+            src={posterSrc}
+            alt="Turnuva Posteri"
+            onError={() => setImgError(true)}
+          />
+        </div>
+      )}
 
       <div className={`${styles.heroCta} fade-up-2`}>
         <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
