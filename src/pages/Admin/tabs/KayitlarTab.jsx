@@ -26,19 +26,10 @@ function buildBracket(players) {
   for (let i = 0; i < rounds[0].length; i++) {
     if (i < byes) {
       rounds[0][i].p1 = shuffled[pi++]
-      rounds[0][i].winner = rounds[0][i].p1
+      // p2 stays null (bye) — no auto-winner, user decides manually
     } else {
       rounds[0][i].p1 = shuffled[pi++]
       rounds[0][i].p2 = shuffled[pi++]
-    }
-  }
-  if (rounds.length > 1) {
-    for (let i = 0; i < rounds[0].length; i++) {
-      if (rounds[0][i].winner) {
-        const nm = Math.floor(i / 2)
-        if (i % 2 === 0) rounds[1][nm].p1 = rounds[0][i].winner
-        else rounds[1][nm].p2 = rounds[0][i].winner
-      }
     }
   }
   return { rounds }
