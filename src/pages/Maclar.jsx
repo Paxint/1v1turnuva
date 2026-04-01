@@ -39,10 +39,10 @@ function MatchCard({ match, onSelect, onClear }) {
   const p2clickable = (!!match.p2 || isBye) && (!hasWinner || p1win)
 
   return (
-    <div className={styles.match}>
+    <div className={`${styles.match} ${hasWinner ? styles.decided : ''}`}>
       {/* Player 1 */}
       <div
-        className={`${styles.player} ${p1win ? styles.won : ''} ${p1clickable ? styles.clickable : ''} ${hasWinner && !p1win ? styles.lost : ''}`}
+        className={`${styles.player} ${p1win ? styles.won : ''} ${p1clickable ? styles.clickable : ''} ${hasWinner && !p1win ? styles.lost : ''} ${!match.p1 ? styles.bye : ''}`}
         onClick={() => p1clickable && onSelect(match.p1)}
       >
         <span className={styles.pName}>{match.p1 || 'TBD'}</span>
@@ -56,7 +56,7 @@ function MatchCard({ match, onSelect, onClear }) {
 
       {/* Player 2 / BYE */}
       <div
-        className={`${styles.player} ${p2win ? styles.won : ''} ${p2clickable && !isBye ? styles.clickable : ''} ${hasWinner && !p2win ? styles.lost : ''}`}
+        className={`${styles.player} ${p2win ? styles.won : ''} ${p2clickable && !isBye ? styles.clickable : ''} ${hasWinner && !p2win ? styles.lost : ''} ${isBye || !match.p2 ? styles.bye : ''}`}
         onClick={() => !isBye && p2clickable && onSelect(match.p2)}
       >
         <span className={styles.pName}>{isBye ? 'BYE' : (match.p2 || 'TBD')}</span>

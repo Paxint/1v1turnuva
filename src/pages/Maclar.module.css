@@ -1,13 +1,13 @@
 .page {
-  max-width: 1400px;
+  max-width: 1500px;
   margin: 0 auto;
-  padding: 2.5rem 1.5rem 4rem;
+  padding: 2.5rem 1.5rem 5rem;
 }
 
 /* ─── Header ─── */
 .pageHeader {
   text-align: center;
-  margin-bottom: 2.5rem;
+  margin-bottom: 2.8rem;
 }
 .pageTag {
   display: inline-flex; align-items: center;
@@ -28,26 +28,53 @@
 .pageHeader h1 span { color: var(--green); }
 
 /* ─── Champion ─── */
+@keyframes champGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(83,252,24,0.2), inset 0 0 20px rgba(83,252,24,0.03); }
+  50%       { box-shadow: 0 0 40px rgba(83,252,24,0.4), inset 0 0 30px rgba(83,252,24,0.07); }
+}
+@keyframes champPulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.04); }
+}
+
 .champion {
   text-align: center;
   font-family: 'Barlow Condensed', sans-serif;
-  font-size: 1.3rem; letter-spacing: 0.1em;
+  font-size: 1rem; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--green);
-  background: rgba(83,252,24,0.06);
-  border: 1px solid rgba(83,252,24,0.25);
-  border-radius: 4px;
-  padding: 0.8rem 2rem;
-  margin: 0 auto 2rem;
+  background: linear-gradient(135deg, rgba(83,252,24,0.07) 0%, rgba(83,252,24,0.03) 100%);
+  border: 1px solid rgba(83,252,24,0.35);
+  border-top: 2px solid var(--green);
+  border-radius: 2px;
+  padding: 1rem 3rem;
+  margin: 0 auto 2.5rem;
   display: block;
   width: fit-content;
+  animation: champGlow 2.5s ease-in-out infinite;
+  position: relative;
 }
-.champion strong { font-size: 1.5rem; }
+.champion::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--green), transparent);
+}
+.champion strong {
+  display: block;
+  font-size: 2rem;
+  letter-spacing: 0.06em;
+  color: var(--green);
+  text-shadow: 0 0 20px rgba(83,252,24,0.6);
+  animation: champPulse 2.5s ease-in-out infinite;
+  line-height: 1.1;
+}
 
 /* ─── Empty state ─── */
 .empty {
   text-align: center;
   padding: 5rem 2rem;
-  color: rgba(212,245,192,0.4);
+  color: rgba(212,245,192,0.35);
   font-size: 1rem;
 }
 .emptyIcon { font-size: 3.5rem; margin-bottom: 1rem; }
@@ -56,8 +83,11 @@
 /* ─── Bracket scroll wrapper ─── */
 .bracketScroll {
   overflow-x: auto;
-  padding-bottom: 1rem;
+  padding-bottom: 1.5rem;
 }
+.bracketScroll::-webkit-scrollbar { height: 4px; }
+.bracketScroll::-webkit-scrollbar-track { background: rgba(83,252,24,0.04); }
+.bracketScroll::-webkit-scrollbar-thumb { background: rgba(83,252,24,0.2); border-radius: 2px; }
 
 /* ─── Bracket layout ─── */
 .bracket {
@@ -71,19 +101,37 @@
 .round {
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 220px;
   flex: 1;
 }
 
 .roundLabel {
-  font-family: 'Barlow Condensed', sans-serif;
-  font-weight: 700; font-size: 0.72rem; letter-spacing: 0.25em;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1rem; letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--green);
+  color: rgba(212,245,192,0.4);
   text-align: center;
-  padding: 0.5rem 0 1rem;
+  padding: 0.6rem 0 1.2rem;
   border-bottom: 1px solid var(--border);
-  margin-bottom: 0;
+  position: relative;
+}
+.roundLabel::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 2px;
+  background: var(--green);
+  opacity: 0.5;
+}
+
+/* Last round: highlight label */
+.round:last-child .roundLabel {
+  color: var(--green);
+}
+.round:last-child .roundLabel::after {
+  width: 60px;
+  opacity: 1;
 }
 
 .matchList {
@@ -92,41 +140,85 @@
   flex: 1;
 }
 
+/* ─── Match slot + connectors ─── */
 .matchSlot {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 16px;
+  padding: 0 20px;
   position: relative;
 }
 
-/* Connector lines */
+/* Right horizontal arm going to next round */
 .matchSlot::before {
   content: '';
   position: absolute;
-  right: 0;
-  top: 50%;
-  width: 16px;
-  height: 2px;
-  background: rgba(83,252,24,0.2);
+  right: 0; top: 50%;
+  width: 20px; height: 1px;
+  background: rgba(83,252,24,0.18);
 }
+
+/* Vertical arm: odd slots go DOWN from center */
+.matchSlot:nth-child(odd)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 50%; bottom: 0;
+  width: 1px;
+  background: rgba(83,252,24,0.18);
+}
+
+/* Vertical arm: even slots go UP from center */
+.matchSlot:nth-child(even)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0; bottom: 50%;
+  width: 1px;
+  background: rgba(83,252,24,0.18);
+}
+
+/* Left incoming arm from previous round */
+.match::before {
+  content: '';
+  position: absolute;
+  left: -20px; top: 50%;
+  width: 20px; height: 1px;
+  background: rgba(83,252,24,0.18);
+  z-index: 1;
+}
+
+/* No right arm on last round */
+.round:last-child .matchSlot::before,
+.round:last-child .matchSlot::after { display: none; }
+
+/* No left arm on first round */
+.round:first-child .match::before { display: none; }
 
 /* ─── Match card ─── */
 .match {
-  width: 170px;
+  width: 180px;
   background: var(--card);
   border: 1px solid var(--border);
-  border-radius: 3px;
+  border-left: 3px solid rgba(83,252,24,0.15);
+  border-radius: 2px;
   overflow: hidden;
   position: relative;
+  transition: border-left-color 0.2s;
 }
 
+/* Match with a decided winner glows on the left border */
+.match.decided {
+  border-left-color: rgba(83,252,24,0.5);
+}
+
+/* ─── Player rows ─── */
 .player {
   display: flex;
   align-items: center;
-  padding: 0.52rem 0.7rem;
-  gap: 0.4rem;
-  min-height: 36px;
+  padding: 0.55rem 0.7rem;
+  gap: 0.5rem;
+  min-height: 38px;
   transition: background 0.15s;
   cursor: default;
   position: relative;
@@ -136,67 +228,87 @@
   cursor: pointer;
 }
 .clickable:hover {
-  background: rgba(83,252,24,0.08);
+  background: rgba(83,252,24,0.07);
 }
 
 .pName {
   flex: 1;
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 600;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   color: var(--text);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 110px;
+  max-width: 120px;
+}
+
+/* Winner row */
+.won {
+  background: rgba(83,252,24,0.06);
+}
+.won .pName {
+  color: var(--green);
+  text-shadow: 0 0 12px rgba(83,252,24,0.4);
+}
+
+/* Loser row */
+.lost .pName {
+  opacity: 0.28;
+}
+
+/* TBD / BYE name style */
+.bye .pName {
+  opacity: 0.3;
+  font-style: italic;
 }
 
 .winBtn {
-  font-size: 0.65rem;
-  color: rgba(83,252,24,0.5);
+  font-size: 0.6rem;
+  color: rgba(83,252,24,0.4);
   flex-shrink: 0;
+  transition: color 0.15s;
 }
-
-.won .pName {
+.clickable:hover .winBtn {
   color: var(--green);
-}
-
-.lost .pName {
-  opacity: 0.35;
 }
 
 .winMark {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--green);
   flex-shrink: 0;
   cursor: pointer;
-  opacity: 0.6;
-  padding: 0 2px;
+  opacity: 0.55;
+  padding: 1px 3px;
   border-radius: 2px;
-  transition: opacity 0.15s, background 0.15s;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  font-family: 'Barlow Condensed', sans-serif;
+  letter-spacing: 0.05em;
 }
 .winMark:hover {
   opacity: 1;
-  background: rgba(255,60,60,0.15);
+  background: rgba(255,60,60,0.12);
   color: #ff6060;
 }
 
 .byeBtn {
-  font-size: 0.65rem;
+  font-size: 0.62rem;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  color: rgba(83,252,24,0.5);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(83,252,24,0.45);
   cursor: pointer;
   flex-shrink: 0;
-  padding: 1px 4px;
-  border: 1px solid rgba(83,252,24,0.2);
-  border-radius: 2px;
+  padding: 1px 5px;
+  border: 1px solid rgba(83,252,24,0.18);
+  border-radius: 1px;
   transition: all 0.15s;
 }
 .byeBtn:hover {
   color: var(--green);
-  border-color: rgba(83,252,24,0.5);
+  border-color: rgba(83,252,24,0.45);
   background: rgba(83,252,24,0.06);
 }
 
