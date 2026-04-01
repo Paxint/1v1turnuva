@@ -1,0 +1,67 @@
+.hero {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 4rem 1.5rem 5rem;
+  min-height: calc(100vh - 64px);
+}
+
+.heroBadge {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.75rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: rgba(83, 252, 24, 0.08);
+  border: 1px solid rgba(83, 252, 24, 0.3);
+  padding: 0.35rem 1rem;
+  border-radius: 2px;
+  margin-bottom: 2rem;
+}
+
+.posterWrap {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+}
+
+.posterWrap::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(135deg, var(--green), transparent 60%, var(--green-dim));
+  border-radius: 6px;
+  z-index: -1;
+  opacity: 0.6;
+}
+
+.posterWrap::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  box-shadow: 0 0 60px rgba(83, 252, 24, 0.2), 0 0 120px rgba(83, 252, 24, 0.08);
+  pointer-events: none;
+}
+
+.poster {
+  width: 100%;
+  display: block;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.heroCta {
+  margin-top: 2.5rem;
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .hero { padding: 2.5rem 1rem 3rem; }
+}

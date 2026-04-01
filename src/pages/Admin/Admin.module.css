@@ -1,0 +1,168 @@
+.body {
+  background: var(--black);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(83, 252, 24, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.panel {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.adminTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.adminTop h1 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 2rem;
+  color: var(--green);
+  letter-spacing: 0.06em;
+}
+
+.backLink {
+  font-size: 0.82rem;
+  color: var(--green);
+  text-decoration: none;
+}
+
+.tabBar {
+  display: flex;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.6rem;
+}
+
+.tab {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.45rem 1rem;
+  border-radius: 3px 3px 0 0;
+  border: 1px solid transparent;
+  cursor: pointer;
+  color: rgba(212, 245, 192, 0.45);
+  background: transparent;
+  transition: all 0.2s;
+}
+
+.tabActive {
+  color: var(--green);
+  border-color: var(--border);
+  background: rgba(83, 252, 24, 0.05);
+}
+
+/* ─── Shared card ─── */
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 1.4rem;
+  margin-bottom: 1.2rem;
+}
+
+.cardTitle {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(212, 245, 192, 0.5);
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* ─── Buttons ─── */
+.btnGreen {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.72rem 1.5rem;
+  border-radius: 3px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  background: var(--green);
+  color: var(--black);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+.btnGreen:hover { filter: brightness(1.1); }
+
+.btnOutline {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.72rem 1.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  width: 100%;
+  background: transparent;
+  color: var(--green);
+  border: 1px solid rgba(83, 252, 24, 0.4);
+  margin-top: 0.7rem;
+}
+
+.btnOutline:hover { background: rgba(83, 252, 24, 0.06); }
+
+.logoutBtn {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.72rem 1.5rem;
+  border-radius: 3px;
+  cursor: pointer;
+  background: transparent;
+  color: var(--green);
+  border: 1px solid rgba(83, 252, 24, 0.4);
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.logoutBtn:hover { background: rgba(83, 252, 24, 0.06); }
+
+/* ─── Messages ─── */
+.sucMsg {
+  font-size: 0.82rem;
+  color: var(--green);
+  margin-top: 0.6rem;
+}
+
+.errMsg {
+  font-size: 0.82rem;
+  color: var(--red);
+  margin-top: 0.6rem;
+}
+
+@media (max-width: 500px) {
+  .body { padding: 1rem; }
+}
