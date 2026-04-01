@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { getBroadcasters, saveBroadcasters, uploadImage } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
-const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '', effect: 'none' }
+const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '', effect: 'none', link_url: '' }
 
 const EFFECT_OPTIONS = [
   { value: 'none',      label: '⭕ Efekt Yok'   },
@@ -37,7 +37,7 @@ export default function YayincilarTab({ theme }) {
     async function load() {
       const rows = await getBroadcasters(theme)
       if (rows.length > 0) {
-        setYayincilar(rows.map(r => ({ name: r.name, subtitle: r.subtitle, image_url: r.image_url, effect: r.effect || 'none' })))
+        setYayincilar(rows.map(r => ({ name: r.name, subtitle: r.subtitle, image_url: r.image_url, effect: r.effect || 'none', link_url: r.link_url || '' })))
       } else {
         setYayincilar([
           { name: 'Paxint',    subtitle: 'Yayıncı', image_url: '', effect: 'none' },
@@ -141,6 +141,14 @@ export default function YayincilarTab({ theme }) {
               placeholder="Unvan"
               value={y.subtitle}
               onChange={e => update(i, 'subtitle', e.target.value)}
+              style={{ marginTop: '0.4rem' }}
+            />
+            <input
+              className="ipt"
+              type="url"
+              placeholder="Link (örn. https://kick.com/paxint)"
+              value={y.link_url || ''}
+              onChange={e => update(i, 'link_url', e.target.value)}
               style={{ marginTop: '0.4rem' }}
             />
             <select

@@ -50,6 +50,9 @@
 }
 
 .card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
   background: var(--card);
   border: 1px solid var(--border);
   border-radius: 6px;

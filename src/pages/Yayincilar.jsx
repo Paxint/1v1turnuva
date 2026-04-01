@@ -45,25 +45,40 @@ export default function Yayincilar() {
       </div>
 
       <div className={`${styles.cards} fade-up-1`}>
-        {broadcasters.map((b, i) => (
-          <div
-            className={styles.card}
-            key={i}
-            onMouseEnter={() => handleEnter(b.effect)}
-            onMouseLeave={handleLeave}
-          >
-            <div className={styles.cardImgWrap}>
-              {b.image_url
-                ? <img className={styles.cardImg} src={b.image_url} alt={b.name} />
-                : <div className={styles.cardImgPlaceholder}>🎮</div>
-              }
-            </div>
-            <div className={styles.cardBody}>
-              <div className={styles.cardName}>{b.name}</div>
-              <div className={styles.cardSub}>{b.subtitle}</div>
-            </div>
-          </div>
-        ))}
+        {broadcasters.map((b, i) => {
+          const inner = (
+            <>
+              <div className={styles.cardImgWrap}>
+                {b.image_url
+                  ? <img className={styles.cardImg} src={b.image_url} alt={b.name} />
+                  : <div className={styles.cardImgPlaceholder}>🎮</div>
+                }
+              </div>
+              <div className={styles.cardBody}>
+                <div className={styles.cardName}>{b.name}</div>
+                <div className={styles.cardSub}>{b.subtitle}</div>
+              </div>
+            </>
+          )
+          return b.link_url ? (
+            <a
+              key={i}
+              className={styles.card}
+              href={b.link_url}
+              target="_blank"
+              rel="noreferrer"
+              onMouseEnter={() => handleEnter(b.effect)}
+              onMouseLeave={handleLeave}
+            >{inner}</a>
+          ) : (
+            <div
+              key={i}
+              className={styles.card}
+              onMouseEnter={() => handleEnter(b.effect)}
+              onMouseLeave={handleLeave}
+            >{inner}</div>
+          )
+        })}
       </div>
 
       <HoverEffect effect={hoveredEffect} active={isHovering} />

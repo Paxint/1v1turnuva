@@ -71,6 +71,7 @@ export async function saveBroadcasters(broadcasterKey, list) {
       subtitle: b.subtitle,
       image_url: b.image_url || '',
       effect: b.effect || 'none',
+      link_url: b.link_url || '',
     }))
   )
   logErr('saveBroadcasters(insert)', insErr)
