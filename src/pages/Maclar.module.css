@@ -37,9 +37,9 @@
   border: 1px solid rgba(83,252,24,0.25);
   border-radius: 4px;
   padding: 0.8rem 2rem;
-  margin-bottom: 2rem;
-  display: inline-block;
-  left: 50%; position: relative; transform: translateX(-50%);
+  margin: 0 auto 2rem;
+  display: block;
+  width: fit-content;
 }
 .champion strong { font-size: 1.5rem; }
 
