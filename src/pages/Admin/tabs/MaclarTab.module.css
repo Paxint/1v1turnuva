@@ -1,0 +1,179 @@
+.wrap {
+  padding: 0.5rem 0;
+}
+
+.empty {
+  font-size: 0.85rem;
+  color: rgba(212,245,192,0.4);
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.champBanner {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.9rem; letter-spacing: 0.18em; text-transform: uppercase;
+  color: var(--green);
+  background: rgba(83,252,24,0.06);
+  border: 1px solid rgba(83,252,24,0.3);
+  border-top: 2px solid var(--green);
+  border-radius: 2px;
+  padding: 0.8rem 2rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+}
+.champBanner strong {
+  display: block;
+  font-size: 1.6rem;
+  letter-spacing: 0.06em;
+  color: var(--green);
+  text-shadow: 0 0 16px rgba(83,252,24,0.5);
+  line-height: 1.1;
+}
+
+.saveMsg {
+  font-size: 0.82rem;
+  color: var(--green);
+  margin-top: 0.8rem;
+  text-align: center;
+}
+
+/* ─── Bracket scroll ─── */
+.bracketScroll {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+.bracketScroll::-webkit-scrollbar { height: 4px; }
+.bracketScroll::-webkit-scrollbar-track { background: rgba(83,252,24,0.04); }
+.bracketScroll::-webkit-scrollbar-thumb { background: rgba(83,252,24,0.2); border-radius: 2px; }
+
+.bracket {
+  display: flex;
+  gap: 0;
+  min-height: 300px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.round {
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  flex: 1;
+}
+
+.roundLabel {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 0.9rem; letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(212,245,192,0.4);
+  text-align: center;
+  padding: 0.5rem 0 1rem;
+  border-bottom: 1px solid var(--border);
+}
+.round:last-child .roundLabel { color: var(--green); }
+
+.matchList {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.matchSlot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 20px;
+  position: relative;
+}
+.matchSlot::before {
+  content: '';
+  position: absolute; right: 0; top: 50%;
+  width: 20px; height: 1px;
+  background: rgba(83,252,24,0.15);
+}
+.matchSlot:nth-child(odd)::after {
+  content: '';
+  position: absolute; right: 0;
+  top: 50%; bottom: 0;
+  width: 1px;
+  background: rgba(83,252,24,0.15);
+}
+.matchSlot:nth-child(even)::after {
+  content: '';
+  position: absolute; right: 0;
+  top: 0; bottom: 50%;
+  width: 1px;
+  background: rgba(83,252,24,0.15);
+}
+.match::before {
+  content: '';
+  position: absolute; left: -20px; top: 50%;
+  width: 20px; height: 1px;
+  background: rgba(83,252,24,0.15);
+  z-index: 1;
+}
+.round:last-child .matchSlot::before,
+.round:last-child .matchSlot::after { display: none; }
+.round:first-child .match::before { display: none; }
+
+/* ─── Match card ─── */
+.match {
+  width: 170px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-left: 3px solid rgba(83,252,24,0.12);
+  border-radius: 2px;
+  overflow: hidden;
+  position: relative;
+  transition: border-left-color 0.2s;
+}
+.match.decided { border-left-color: rgba(83,252,24,0.5); }
+
+.player {
+  display: flex; align-items: center;
+  padding: 0.5rem 0.65rem; gap: 0.4rem;
+  min-height: 36px;
+  transition: background 0.15s;
+  cursor: default;
+  position: relative;
+}
+.clickable { cursor: pointer; }
+.clickable:hover { background: rgba(83,252,24,0.07); }
+
+.pName {
+  flex: 1;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.85rem; font-weight: 700; letter-spacing: 0.04em;
+  color: var(--text);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  max-width: 110px;
+}
+.won { background: rgba(83,252,24,0.06); }
+.won .pName { color: var(--green); text-shadow: 0 0 10px rgba(83,252,24,0.4); }
+.lost .pName { opacity: 0.28; }
+.bye .pName { opacity: 0.3; font-style: italic; }
+
+.winBtn {
+  font-size: 0.58rem; color: rgba(83,252,24,0.4); flex-shrink: 0;
+  transition: color 0.15s;
+}
+.clickable:hover .winBtn { color: var(--green); }
+
+.winMark {
+  font-size: 0.65rem; color: var(--green); flex-shrink: 0;
+  cursor: pointer; opacity: 0.55; padding: 1px 3px; border-radius: 2px;
+  transition: opacity 0.15s, background 0.15s, color 0.15s;
+  font-family: 'Barlow Condensed', sans-serif; letter-spacing: 0.05em;
+}
+.winMark:hover { opacity: 1; background: rgba(255,60,60,0.12); color: #ff6060; }
+
+.byeBtn {
+  font-size: 0.6rem; font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase;
+  color: rgba(83,252,24,0.45); cursor: pointer; flex-shrink: 0;
+  padding: 1px 4px; border: 1px solid rgba(83,252,24,0.18); border-radius: 1px;
+  transition: all 0.15s;
+}
+.byeBtn:hover { color: var(--green); border-color: rgba(83,252,24,0.45); background: rgba(83,252,24,0.06); }
+
+.divider { height: 1px; background: var(--border); }
