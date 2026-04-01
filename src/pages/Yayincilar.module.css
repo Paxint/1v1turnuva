@@ -100,7 +100,7 @@
   color: var(--border);
 }
 
-.cardBody { padding: 1rem 1.2rem 1.2rem; }
+.cardBody { padding: 1rem 1.2rem 1.2rem; text-align: center; }
 
 .cardName {
   font-family: 'Bebas Neue', cursive;
