@@ -5,16 +5,19 @@ import styles from './Tabs.module.css'
 export default function GenelTab({ theme, setTheme }) {
   const [badge, setBadge] = useState('')
   const [followUrl, setFollowUrl] = useState('')
+  const [countdown, setCountdown] = useState('')
   const [sucMsg, setSucMsg] = useState('')
 
   useEffect(() => {
     async function load() {
-      const [b, f] = await Promise.all([
+      const [b, f, c] = await Promise.all([
         getSetting(theme, 'badge'),
         getSetting(theme, 'follow_url'),
+        getSetting(theme, 'countdown_target'),
       ])
       setBadge(b || '')
       setFollowUrl(f || '')
+      setCountdown(c || '')
     }
     load()
   }, [theme])
@@ -27,6 +30,9 @@ export default function GenelTab({ theme, setTheme }) {
       followUrl.trim()
         ? setSetting(theme, 'follow_url', followUrl.trim())
         : deleteSetting(theme, 'follow_url'),
+      countdown.trim()
+        ? setSetting(theme, 'countdown_target', countdown.trim())
+        : deleteSetting(theme, 'countdown_target'),
     ])
     setSucMsg('✅ Kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
@@ -81,11 +87,18 @@ export default function GenelTab({ theme, setTheme }) {
         />
         <label className={styles.fieldLabel}>🔗 "Takip Et" Butonu Linki</label>
         <input
-          className="ipt"
+          className={`ipt ${styles.mb}`}
           type="text"
           placeholder="https://kick.com/paxint"
           value={followUrl}
           onChange={e => setFollowUrl(e.target.value)}
+        />
+        <label className={styles.fieldLabel}>⏱️ Geri Sayım Tarihi (Anasayfada gösterilir)</label>
+        <input
+          className="ipt"
+          type="datetime-local"
+          value={countdown}
+          onChange={e => setCountdown(e.target.value)}
         />
         <div style={{ marginTop: '0.8rem' }}>
           <button className={styles.btnGreen} onClick={saveSettings}>💾 Kaydet</button>
