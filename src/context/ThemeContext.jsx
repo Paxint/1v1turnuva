@@ -7,6 +7,18 @@ const THEMES = ['pax', 'raku', 'redjangu']
 
 export function ThemeProvider({ children }) {
   const [theme, setThemeState] = useState('pax')
+  const [ready, setReady] = useState(false)
+
+  // Hide page until theme is confirmed to avoid flash
+  useEffect(() => {
+    const root = document.documentElement
+    if (!ready) {
+      root.style.opacity = '0'
+    } else {
+      root.style.transition = 'opacity 0.15s'
+      root.style.opacity = '1'
+    }
+  }, [ready])
 
   // Apply theme class to <html>
   useEffect(() => {
@@ -21,13 +33,13 @@ export function ThemeProvider({ children }) {
     async function load() {
       const val = await getSetting('global', 'active_theme')
       if (val && THEMES.includes(val)) setThemeState(val)
+      setReady(true)
     }
     load()
     const unsub = subscribeToTable('settings', () => load())
     return unsub
   }, [])
 
-  // setTheme: save to Supabase (admin calls this), everyone syncs via realtime
   async function setTheme(val) {
     if (!THEMES.includes(val)) return
     setThemeState(val)
