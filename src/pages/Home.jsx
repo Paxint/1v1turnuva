@@ -69,6 +69,7 @@ export default function Home() {
   const [countdownTarget, setCountdownTarget] = useState(null)
 
   const load = useCallback(async () => {
+    setPosterSrc(null)
     const [b, f, p, c, regs, bracket] = await Promise.all([
       getSetting(theme, 'badge'),
       getSetting(theme, 'follow_url'),
