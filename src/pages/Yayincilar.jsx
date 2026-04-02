@@ -44,8 +44,9 @@ export default function Yayincilar() {
       const res = await fetch(`/api/kick-live?usernames=${usernames.join(',')}`)
       if (!res.ok) return
       const data = await res.json()
+      console.log('[kick-live] response:', data)
       setLiveStatus(data)
-    } catch { /* sessizce geç */ }
+    } catch (e) { console.warn('[kick-live] hata:', e) }
   }, [])
 
   useEffect(() => {
