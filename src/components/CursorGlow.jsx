@@ -56,11 +56,14 @@ export default function CursorGlow() {
     const TRANSITION_MS = 600
     const FRAMES = 24
 
+    const styleTag = document.createElement('style')
+    styleTag.id = 'cursor-override'
+    document.head.appendChild(styleTag)
+
     function applyColor(color) {
       currentColor = color
-      document.documentElement.style.cursor = isPointer
-        ? makePointer(color)
-        : makeCursor(color)
+      const val = isPointer ? makePointer(color) : makeCursor(color)
+      styleTag.textContent = `html, html * { cursor: ${val} !important; }`
     }
 
     function transition(fromIdx, toIdx) {
@@ -77,9 +80,8 @@ export default function CursorGlow() {
 
     function onMouseOver(e) {
       isPointer = window.getComputedStyle(e.target).cursor === 'pointer'
-      document.documentElement.style.cursor = isPointer
-        ? makePointer(currentColor)
-        : makeCursor(currentColor)
+      const val = isPointer ? makePointer(currentColor) : makeCursor(currentColor)
+      styleTag.textContent = `html, html * { cursor: ${val} !important; }`
     }
 
     applyColor(COLORS[0])
@@ -94,7 +96,7 @@ export default function CursorGlow() {
       clearInterval(mainTimer)
       clearInterval(transitionTimer)
       document.removeEventListener('mouseover', onMouseOver)
-      document.documentElement.style.cursor = ''
+      styleTag.remove()
     }
   }, [])
 
