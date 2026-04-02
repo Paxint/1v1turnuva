@@ -56,9 +56,11 @@ export default function CursorGlow() {
     const TRANSITION_MS = 600
     const FRAMES = 24
 
-    const styleTag = document.createElement('style')
-    styleTag.id = 'cursor-override'
-    document.head.appendChild(styleTag)
+    const styleTag = document.getElementById('cursor-override') || document.createElement('style')
+    if (!styleTag.parentNode) {
+      styleTag.id = 'cursor-override'
+      document.head.appendChild(styleTag)
+    }
 
     function applyColor(color) {
       currentColor = color
