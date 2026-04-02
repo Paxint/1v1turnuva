@@ -34,6 +34,13 @@ export default function Cark() {
   const [input, setInput] = useState('')
   const [spinning, setSpinning] = useState(false)
   const [winner, setWinner] = useState(null)
+  const [teamDraw, setTeamDraw] = useState(null)
+
+  function drawFive() {
+    if (options.length < 10) return
+    const shuffled = [...options].sort(() => Math.random() - 0.5)
+    setTeamDraw({ team1: shuffled.slice(0, 5), team2: shuffled.slice(5, 10) })
+  }
 
   const draw = useCallback((angle) => {
     const canvas = canvasRef.current
@@ -207,6 +214,12 @@ export default function Cark() {
             ))}
           </ul>
 
+          {options.length >= 10 && (
+            <button className={styles.drawBtn} onClick={drawFive}>
+              🎲 5'li Takım Çek
+            </button>
+          )}
+
           {options.length > 0 && (
             <button className={styles.clearBtn} onClick={clearAll}>🗑️ Tümünü Temizle</button>
           )}
@@ -236,6 +249,38 @@ export default function Cark() {
           </button>
         </div>
       </div>
+
+      {/* 5'li takım çekimi modal */}
+      {teamDraw && (
+        <div className={styles.overlay} onClick={() => setTeamDraw(null)}>
+          <div className={styles.teamModal} onClick={e => e.stopPropagation()}>
+            <div className={styles.teamModalTitle}>🎲 Takım Çekimi</div>
+            <div className={styles.teams}>
+              <div className={styles.team}>
+                <div className={styles.teamLabel} style={{ color: '#53fc18' }}>Takım 1</div>
+                <ul className={styles.teamList}>
+                  {teamDraw.team1.map((p, i) => (
+                    <li key={i} className={styles.teamPlayer} style={{ borderLeftColor: '#53fc18' }}>{p}</li>
+                  ))}
+                </ul>
+              </div>
+              <div className={styles.teamDivider}>VS</div>
+              <div className={styles.team}>
+                <div className={styles.teamLabel} style={{ color: '#00c2ff' }}>Takım 2</div>
+                <ul className={styles.teamList}>
+                  {teamDraw.team2.map((p, i) => (
+                    <li key={i} className={styles.teamPlayer} style={{ borderLeftColor: '#00c2ff' }}>{p}</li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+            <div className={styles.teamActions}>
+              <button className={styles.reDrawBtn} onClick={drawFive}>🔀 Yeniden Çek</button>
+              <button className={styles.modalClose} onClick={() => setTeamDraw(null)}>Kapat</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Kazanan modal */}
       {winner && (

@@ -163,6 +163,27 @@
 }
 .delBtn:hover { color: #ff4444; }
 
+.drawBtn {
+  width: 100%;
+  background: rgba(0, 194, 255, 0.08);
+  border: 1px solid rgba(0, 194, 255, 0.35);
+  color: #00c2ff;
+  border-radius: 3px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.drawBtn:hover {
+  background: rgba(0, 194, 255, 0.16);
+  border-color: #00c2ff;
+  box-shadow: 0 0 12px rgba(0, 194, 255, 0.2);
+}
+
 .clearBtn {
   width: 100%;
   background: none;
@@ -231,6 +252,99 @@
 .spinBtn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+}
+
+/* ─── Team draw modal ─── */
+.teamModal {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 2rem 2.5rem;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.7);
+  animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  max-width: 90vw;
+  width: 560px;
+}
+
+.teamModalTitle {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.8rem;
+  letter-spacing: 0.1em;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.teams {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.team { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.teamLabel {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.1em;
+  text-align: center;
+  margin-bottom: 0.3rem;
+  text-shadow: 0 0 16px currentColor;
+}
+
+.teamList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.teamPlayer {
+  padding: 0.4rem 0.7rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  border-left: 3px solid;
+  border-radius: 3px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  color: var(--text);
+}
+
+.teamDivider {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.4rem;
+  color: rgba(212, 245, 192, 0.2);
+  text-align: center;
+  padding: 0 0.5rem;
+}
+
+.teamActions {
+  display: flex;
+  gap: 0.8rem;
+}
+
+.reDrawBtn {
+  flex: 1;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.6rem 1rem;
+  background: rgba(83, 252, 24, 0.08);
+  border: 1px solid rgba(83, 252, 24, 0.3);
+  color: var(--green);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.reDrawBtn:hover {
+  background: rgba(83, 252, 24, 0.15);
+  box-shadow: 0 0 12px var(--green-glow);
 }
 
 /* ─── Winner overlay ─── */
