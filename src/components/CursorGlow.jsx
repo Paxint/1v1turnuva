@@ -33,8 +33,27 @@ function makeCursor(color) {
   return `url("data:image/svg+xml,${svg}") 0 0, auto`
 }
 
+function makePointer(color) {
+  const svg = encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="28" viewBox="0 0 22 28">
+      <path d="M6 0 C6 0 6 14 6 14 C6 14 4 12 2 13 C0 14 1 17 3 18 C5 19 8 23 10 25 C12 27 14 28 16 28 C20 28 22 25 22 21 L22 14 C22 14 22 12 20 12 C18 12 18 13 18 13 C18 13 18 11 16 11 C14 11 14 12 14 12 C14 12 14 10 12 10 C10 10 10 11 10 11 L10 0 C10 0 10 -1 8 -1 C6 -1 6 0 6 0 Z"
+        fill="${color}" stroke="#000" stroke-width="1" stroke-linejoin="round"/>
+    </svg>`
+  )
+  return `url("data:image/svg+xml,${svg}") 6 0, pointer`
+}
+
+let styleTag = null
+
 function setCursor(color) {
   document.documentElement.style.cursor = makeCursor(color)
+
+  if (!styleTag) {
+    styleTag = document.createElement('style')
+    styleTag.id = 'cursor-pointer-override'
+    document.head.appendChild(styleTag)
+  }
+  styleTag.textContent = `a, button, [role="button"], label, select, [tabindex] { cursor: ${makePointer(color)} !important; }`
 }
 
 export default function CursorGlow() {
@@ -72,6 +91,7 @@ export default function CursorGlow() {
       clearInterval(mainTimer)
       clearInterval(transitionTimer)
       document.documentElement.style.cursor = ''
+      if (styleTag) { styleTag.remove(); styleTag = null }
     }
   }, [])
 
