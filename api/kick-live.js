@@ -21,36 +21,23 @@ export default async function handler(req, res) {
   }
 
   async function checkUser(username) {
-    // v2 dene
-    try {
-      const r = await fetch(
-        `https://kick.com/api/v2/channels/${encodeURIComponent(username)}`,
-        { headers: HEADERS }
-      )
-      if (r.ok) {
+    for (const url of [
+      `https://kick.com/api/v2/channels/${encodeURIComponent(username)}`,
+      `https://kick.com/api/v1/channels/${encodeURIComponent(username)}`,
+    ]) {
+      try {
+        const r = await fetch(url, { headers: HEADERS })
         const text = await r.text()
+        console.log(`[kick-live] ${username} | ${url} | status:${r.status} | body:${text.slice(0, 200)}`)
+        if (!r.ok) continue
         try {
           const data = JSON.parse(text)
           return !!data?.livestream
-        } catch { /* JSON değil, v1 dene */ }
+        } catch { continue }
+      } catch (e) {
+        console.log(`[kick-live] ${username} | fetch error:`, e.message)
       }
-    } catch { /* v1 dene */ }
-
-    // v1 dene
-    try {
-      const r = await fetch(
-        `https://kick.com/api/v1/channels/${encodeURIComponent(username)}`,
-        { headers: HEADERS }
-      )
-      if (r.ok) {
-        const text = await r.text()
-        try {
-          const data = JSON.parse(text)
-          return !!data?.livestream
-        } catch { /* parse edilemedi */ }
-      }
-    } catch { /* her iki endpoint de başarısız */ }
-
+    }
     return false
   }
 
@@ -61,6 +48,5 @@ export default async function handler(req, res) {
     })
   )
 
-  console.log('[kick-live] results:', JSON.stringify(results))
   return res.status(200).json(results)
 }
