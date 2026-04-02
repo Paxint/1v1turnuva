@@ -50,7 +50,7 @@ export default function Admin() {
 
   return (
     <div className={styles.body}>
-      <div className={styles.panel}>
+      <div className={`${styles.panel} ${activeTab === 'maclar' ? styles.panelWide : ''}`}>
         <div className={styles.adminTop}>
           <h1>⚙️ Admin Panel</h1>
           <a href="/" className={styles.backLink}>← Anasayfaya Dön</a>

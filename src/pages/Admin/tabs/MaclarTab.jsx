@@ -68,6 +68,11 @@ export default function MaclarTab() {
   const [bracket, setBracket] = useState(null)
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState('')
+  const [zoom, setZoom] = useState(1)
+
+  function zoomIn()    { setZoom(z => Math.min(1.5, +(z + 0.1).toFixed(1))) }
+  function zoomOut()   { setZoom(z => Math.max(0.5, +(z - 0.1).toFixed(1))) }
+  function zoomReset() { setZoom(1) }
 
   const load = useCallback(async () => {
     const data = await getBracket()
@@ -144,8 +149,14 @@ export default function MaclarTab() {
           {champion && (
             <div className={styles.champBanner}>🏆 Şampiyon: <strong>{champion}</strong></div>
           )}
+          <div className={styles.zoomBar}>
+            <button className={styles.zoomBtn} onClick={zoomOut} title="Küçült">−</button>
+            <span className={styles.zoomVal} onClick={zoomReset} title="Sıfırla">{Math.round(zoom * 100)}%</span>
+            <button className={styles.zoomBtn} onClick={zoomIn} title="Büyüt">+</button>
+          </div>
+
           <div className={styles.bracketScroll}>
-            <div className={styles.bracket}>
+            <div className={styles.bracket} style={{ zoom }}>
               {bracket.rounds.map((round, rIdx) => (
                 <div className={styles.round} key={rIdx}>
                   <div className={styles.roundLabel}>

@@ -18,6 +18,11 @@
   z-index: 1;
   max-width: 680px;
   margin: 0 auto;
+  transition: max-width 0.3s ease;
+}
+
+.panelWide {
+  max-width: min(1600px, calc(100vw - 2rem));
 }
 
 .adminTop {

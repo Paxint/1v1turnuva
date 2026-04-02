@@ -37,14 +37,54 @@
   text-align: center;
 }
 
+/* ─── Zoom bar ─── */
+.zoomBar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.8rem;
+  justify-content: flex-end;
+}
+
+.zoomBtn {
+  width: 28px; height: 28px;
+  background: rgba(83,252,24,0.08);
+  border: 1px solid rgba(83,252,24,0.25);
+  color: var(--green);
+  border-radius: 3px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.15s;
+  display: flex; align-items: center; justify-content: center;
+}
+.zoomBtn:hover { background: rgba(83,252,24,0.18); }
+
+.zoomVal {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  color: rgba(212,245,192,0.45);
+  min-width: 38px;
+  text-align: center;
+  cursor: pointer;
+  user-select: none;
+}
+.zoomVal:hover { color: var(--green); }
+
 /* ─── Bracket scroll ─── */
 .bracketScroll {
   overflow-x: auto;
-  padding-bottom: 1rem;
+  overflow-y: visible;
+  padding-bottom: 1.2rem;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: rgba(83,252,24,0.01);
 }
-.bracketScroll::-webkit-scrollbar { height: 4px; }
-.bracketScroll::-webkit-scrollbar-track { background: rgba(83,252,24,0.04); }
-.bracketScroll::-webkit-scrollbar-thumb { background: rgba(83,252,24,0.2); border-radius: 2px; }
+.bracketScroll::-webkit-scrollbar { height: 5px; }
+.bracketScroll::-webkit-scrollbar-track { background: rgba(83,252,24,0.04); border-radius: 3px; }
+.bracketScroll::-webkit-scrollbar-thumb { background: rgba(83,252,24,0.25); border-radius: 3px; }
 
 .bracket {
   display: flex;
@@ -52,12 +92,13 @@
   min-height: 300px;
   width: max-content;
   min-width: 100%;
+  padding: 0.5rem 0;
 }
 
 .round {
   display: flex;
   flex-direction: column;
-  min-width: 200px;
+  min-width: 220px;
   flex: 1;
 }
 
