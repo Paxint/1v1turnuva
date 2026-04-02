@@ -1,10 +1,16 @@
 import { useState, useEffect, useRef } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
+import { getSetting } from '../lib/supabase'
 
 export default function Navbar() {
   const [open, setOpen] = useState(false)
+  const [carkEnabled, setCarkEnabled] = useState(false)
   const location = useLocation()
   const navRef = useRef(null)
+
+  useEffect(() => {
+    getSetting('global', 'cark_enabled').then(v => setCarkEnabled(v === 'true'))
+  }, [])
 
   useEffect(() => setOpen(false), [location])
 
@@ -38,6 +44,9 @@ export default function Navbar() {
         <li><NavLink to="/kurallar" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>Kurallar</NavLink></li>
         <li><NavLink to="/maclar" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>Maçlar</NavLink></li>
         <li><NavLink to="/kayit" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>Kayıt</NavLink></li>
+        {carkEnabled && (
+          <li><NavLink to="/cark" onClick={close} className={({ isActive }) => isActive ? 'active' : ''}>Çark</NavLink></li>
+        )}
       </ul>
     </nav>
   )

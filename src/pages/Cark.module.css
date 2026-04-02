@@ -1,0 +1,317 @@
+.page {
+  position: relative;
+  z-index: 1;
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 3rem 1.5rem 5rem;
+}
+
+/* ─── Header ─── */
+.pageHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.pageTag {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--green);
+  background: rgba(83, 252, 24, 0.08);
+  border: 1px solid rgba(83, 252, 24, 0.25);
+  padding: 0.3rem 0.9rem;
+  border-radius: 2px;
+  display: inline-block;
+}
+
+.pageHeader h1 {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 3rem;
+  letter-spacing: 0.06em;
+  margin-top: 0.8rem;
+  line-height: 1;
+  color: #fff;
+}
+
+.pageHeader h1 span {
+  color: var(--green);
+  text-shadow: 0 0 30px var(--green-glow);
+}
+
+/* ─── Layout ─── */
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  .wheelWrap { order: -1; }
+}
+
+/* ─── Sidebar ─── */
+.sidebar {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.sideTitle {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.3rem;
+  letter-spacing: 0.08em;
+  color: var(--green);
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.count {
+  font-size: 0.9rem;
+  color: rgba(212, 245, 192, 0.35);
+  margin-left: 0.3rem;
+}
+
+.addRow {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.addBtn {
+  flex-shrink: 0;
+  width: 40px;
+  background: var(--green);
+  color: var(--black);
+  border: none;
+  border-radius: 2px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+.addBtn:hover { filter: brightness(1.15); }
+
+.emptyHint {
+  font-size: 0.8rem;
+  color: rgba(212, 245, 192, 0.3);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
+.warnHint {
+  font-size: 0.78rem;
+  color: rgba(255, 200, 0, 0.6);
+  text-align: center;
+}
+
+.list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  max-height: 360px;
+  overflow-y: auto;
+  padding-right: 2px;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 0.42rem 0.6rem;
+}
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.itemName {
+  flex: 1;
+  font-size: 0.88rem;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delBtn {
+  background: none;
+  border: none;
+  color: rgba(212, 245, 192, 0.25);
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0 2px;
+  flex-shrink: 0;
+  transition: color 0.2s;
+  line-height: 1;
+}
+.delBtn:hover { color: #ff4444; }
+
+.clearBtn {
+  width: 100%;
+  background: none;
+  border: 1px solid rgba(255, 68, 68, 0.25);
+  color: rgba(255, 68, 68, 0.55);
+  border-radius: 3px;
+  padding: 0.45rem;
+  cursor: pointer;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+  margin-top: 0.2rem;
+}
+.clearBtn:hover {
+  border-color: #ff4444;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.05);
+}
+
+/* ─── Wheel ─── */
+.wheelWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.pointer {
+  color: var(--green);
+  font-size: 2rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 10px var(--green-glow));
+  margin-bottom: -0.6rem;
+  z-index: 1;
+}
+
+.canvas {
+  display: block;
+  max-width: 100%;
+  filter: drop-shadow(0 0 40px rgba(83, 252, 24, 0.18));
+  border-radius: 50%;
+}
+
+.spinBtn {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1.4rem;
+  letter-spacing: 0.15em;
+  padding: 0.7rem 3rem;
+  background: var(--green);
+  color: var(--black);
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  transition: filter 0.2s, transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 20px var(--green-glow);
+}
+.spinBtn:hover:not(:disabled) {
+  filter: brightness(1.12);
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px var(--green-glow);
+}
+.spinBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* ─── Winner overlay ─── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.78);
+  backdrop-filter: blur(8px);
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal {
+  background: var(--card);
+  border: 1px solid var(--green);
+  border-radius: 8px;
+  padding: 2.5rem 3.5rem;
+  text-align: center;
+  box-shadow: 0 0 80px var(--green-glow), 0 24px 60px rgba(0, 0, 0, 0.7);
+  animation: popIn 0.38s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  max-width: 90vw;
+}
+
+@keyframes popIn {
+  from { transform: scale(0.6); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.confetti {
+  font-size: 3rem;
+  margin-bottom: 0.4rem;
+  animation: bounce 0.6s ease infinite alternate;
+}
+
+@keyframes bounce {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-8px); }
+}
+
+.modalLabel {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.75rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: rgba(212, 245, 192, 0.45);
+  margin-bottom: 0.25rem;
+}
+
+.modalWinner {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 3.8rem;
+  letter-spacing: 0.06em;
+  color: var(--green);
+  text-shadow: 0 0 40px var(--green-glow);
+  margin-bottom: 1.8rem;
+  line-height: 1;
+}
+
+.modalClose {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  padding: 0.6rem 2rem;
+  background: none;
+  border: 1px solid var(--green);
+  color: var(--green);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.modalClose:hover {
+  background: rgba(83, 252, 24, 0.1);
+  box-shadow: 0 0 20px var(--green-glow);
+}
+
+@media (max-width: 600px) {
+  .page { padding: 2rem 1rem 4rem; }
+  .modal { padding: 2rem 2rem; }
+  .modalWinner { font-size: 2.8rem; }
+}

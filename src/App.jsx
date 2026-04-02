@@ -7,6 +7,7 @@ import Yayincilar from './pages/Yayincilar'
 import Kurallar from './pages/Kurallar'
 import Kayit from './pages/Kayit'
 import Maclar from './pages/Maclar'
+import Cark from './pages/Cark'
 import Admin from './pages/Admin'
 
 function Layout() {
@@ -29,6 +30,7 @@ export default function App() {
         <Route path="/kurallar" element={<Kurallar />} />
         <Route path="/maclar" element={<Maclar />} />
         <Route path="/kayit" element={<Kayit />} />
+        <Route path="/cark" element={<Cark />} />
       </Route>
       <Route path="/admin" element={<Admin />} />
     </Routes>

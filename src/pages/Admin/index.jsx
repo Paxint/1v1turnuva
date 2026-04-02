@@ -8,6 +8,7 @@ import KurallarTab from './tabs/KurallarTab'
 import KayitlarTab from './tabs/KayitlarTab'
 import MaclarTab from './tabs/MaclarTab'
 import ApiKeyTab from './tabs/ApiKeyTab'
+import CarkTab from './tabs/CarkTab'
 import styles from './Admin.module.css'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Paxint2026'
@@ -21,6 +22,7 @@ const TABS = [
   { id: 'kayitlar',   label: '📝 Kayıtlar' },
   { id: 'maclar',     label: '🏆 Maçlar' },
   { id: 'apikey',     label: '🔑 API Key' },
+  { id: 'cark',       label: '🎡 Çark' },
 ]
 
 export default function Admin() {
@@ -75,6 +77,7 @@ export default function Admin() {
         {activeTab === 'kayitlar'   && <KayitlarTab />}
         {activeTab === 'maclar'     && <MaclarTab />}
         {activeTab === 'apikey'     && <ApiKeyTab />}
+        {activeTab === 'cark'       && <CarkTab />}
 
         <button className={styles.logoutBtn} onClick={handleLogout}>Çıkış Yap</button>
       </div>
