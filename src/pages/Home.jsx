@@ -100,6 +100,7 @@ export default function Home() {
   const flameIntensity = animCount < FLAME_MIN
     ? 0
     : Math.min(1, (animCount - FLAME_MIN) / (FLAME_MAX - FLAME_MIN))
+  const flameVisual = flameIntensity > 0 ? Math.pow(flameIntensity, 0.4) : 0
 
   return (
     <section className={styles.hero}>
@@ -143,7 +144,7 @@ export default function Home() {
 
       {/* Stats strip */}
       <div className={`${styles.statsStrip} fade-up-3`}>
-        <div className={`${styles.statItem} ${styles.statItemFire}`} style={{ '--flame': flameIntensity }}>
+        <div className={`${styles.statItem} ${styles.statItemFire}`} style={{ '--flame': flameIntensity, '--flame-v': flameVisual }}>
           {flameIntensity > 0 && <span className={styles.flame} aria-hidden />}
           <span className={styles.statNum}>{animCount}</span>
           <span className={styles.statLabel}>Kayıtlı Oyuncu</span>
