@@ -25,7 +25,7 @@ function blendColor(c1, c2, t) {
 
 function makeCursor(color) {
   const svg = encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 16 22">
+    `<svg xmlns="http://www.w3.org/2000/svg" width="22" height="30" viewBox="0 0 16 22">
       <path d="M0 0 L0 18 L4 13.5 L7 21 L9 20 L6 12.5 L12 12.5 Z"
         fill="${color}" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
     </svg>`
