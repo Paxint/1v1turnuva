@@ -29,6 +29,20 @@ export default function Kayit() {
       setLolErr('❌ Geçersiz format. Örnek: OyuncuAdı#TR1'); return
     }
 
+    // Riot API ile hesap doğrulama
+    try {
+      const res = await fetch(
+        `/api/riot-check?name=${encodeURIComponent(lolParts[0].trim())}&tag=${encodeURIComponent(lolParts[1].trim())}`
+      )
+      const data = await res.json()
+      if (res.ok && data.exists === false) {
+        setLolErr('❌ Bu Riot hesabı bulunamadı. Nick#TAG formatını kontrol et.')
+        setLoading(false); return
+      }
+    } catch {
+      // API erişilemezse format kontrolüyle devam et
+    }
+
     setLoading(true)
 
     // Duplicate check
