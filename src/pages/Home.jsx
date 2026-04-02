@@ -59,7 +59,7 @@ function CountdownUnit({ value, label }) {
 }
 
 export default function Home() {
-  const { theme } = useTheme()
+  const { theme, ready } = useTheme()
   const [badge, setBadge] = useState('Sadece Kick\'te — Her Pazar 20:30')
   const [followUrl, setFollowUrl] = useState('https://kick.com/paxint')
   const [posterSrc, setPosterSrc] = useState(null)
@@ -69,7 +69,6 @@ export default function Home() {
   const [countdownTarget, setCountdownTarget] = useState(null)
 
   const load = useCallback(async () => {
-    setPosterSrc(null)
     const [b, f, p, c, regs, bracket] = await Promise.all([
       getSetting(theme, 'badge'),
       getSetting(theme, 'follow_url'),
@@ -88,11 +87,12 @@ export default function Home() {
   }, [theme])
 
   useEffect(() => {
+    if (!ready) return
     load()
     const unsub1 = subscribeToTable('settings', load)
     const unsub2 = subscribeToTable('registrations', load)
     return () => { unsub1(); unsub2() }
-  }, [load])
+  }, [load, ready])
 
   const animCount = useCountUp(regCount)
   const countdown = useCountdown(countdownTarget)
