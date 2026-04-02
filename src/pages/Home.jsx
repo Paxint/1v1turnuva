@@ -88,8 +88,9 @@ export default function Home() {
 
   useEffect(() => {
     load()
-    const unsub = subscribeToTable('settings', load)
-    return unsub
+    const unsub1 = subscribeToTable('settings', load)
+    const unsub2 = subscribeToTable('registrations', load)
+    return () => { unsub1(); unsub2() }
   }, [load])
 
   const animCount = useCountUp(regCount)
