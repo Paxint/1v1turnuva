@@ -1,6 +1,7 @@
 import { Routes, Route, Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
+import CursorGlow from './components/CursorGlow'
 import Home from './pages/Home'
 import Yayincilar from './pages/Yayincilar'
 import Kurallar from './pages/Kurallar'
@@ -11,6 +12,7 @@ import Admin from './pages/Admin'
 function Layout() {
   return (
     <>
+      <CursorGlow />
       <Navbar />
       <Outlet />
       <Footer />
