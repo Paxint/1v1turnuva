@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { getBracket, saveBracket, subscribeToTable } from '../../../lib/supabase'
 import styles from './MaclarTab.module.css'
+import tabStyles from './Tabs.module.css'
 
 function roundName(rIdx, total) {
   const rev = total - 1 - rIdx
@@ -107,6 +108,29 @@ export default function MaclarTab() {
     setTimeout(() => setMsg(''), 2000)
   }
 
+  async function handleClearBracket() {
+    if (!window.confirm('Bracket silinsin mi?')) return
+    await saveBracket(null)
+    setBracket(null)
+    setMsg('✅ Bracket silindi.')
+    setTimeout(() => setMsg(''), 2000)
+  }
+
+  async function handleResetBracket() {
+    if (!window.confirm('Tüm sonuçlar sıfırlanıp bracket başa döndürülsün mü?')) return
+    const next = JSON.parse(JSON.stringify(bracket))
+    next.rounds.forEach((round, rIdx) => {
+      round.forEach(match => {
+        match.winner = null
+        if (rIdx > 0) { match.p1 = null; match.p2 = null }
+      })
+    })
+    setBracket(next)
+    await saveBracket(next)
+    setMsg('✅ Bracket başa döndürüldü.')
+    setTimeout(() => setMsg(''), 2000)
+  }
+
   const champion = bracket?.rounds?.at(-1)?.[0]?.winner
 
   return (
@@ -147,6 +171,14 @@ export default function MaclarTab() {
             </div>
           </div>
           {msg && <div className={styles.saveMsg}>{msg}</div>}
+          <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.2rem' }}>
+            <button className={tabStyles.btnOutline} onClick={handleResetBracket} style={{ flex: 1 }}>
+              🔄 Başa Döndür
+            </button>
+            <button className={tabStyles.btnOutline} onClick={handleClearBracket} style={{ flex: 1, color: '#ff6060', borderColor: 'rgba(255,96,96,0.4)' }}>
+              🗑️ Bracket Temizle
+            </button>
+          </div>
         </>
       )}
     </div>
