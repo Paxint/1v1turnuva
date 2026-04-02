@@ -2,26 +2,56 @@ import { useEffect, useState } from 'react'
 import { getSetting, setSetting, deleteSetting } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
-export default function ApiKeyTab() {
-  const [riotKey, setRiotKey]   = useState('')
-  const [show, setShow]         = useState(false)
-  const [sucMsg, setSucMsg]     = useState('')
-  const [errMsg, setErrMsg]     = useState('')
+const API_KEY_PASSWORD = '37291307'
 
-  useEffect(() => {
-    getSetting('global', 'riot_api_key').then(v => setRiotKey(v || ''))
-  }, [])
+export default function ApiKeyTab() {
+  const [unlocked, setUnlocked] = useState(false)
+  const [passInput, setPassInput] = useState('')
+  const [passErr, setPassErr]     = useState('')
+
+  const [riotKey, setRiotKey] = useState('')
+  const [show, setShow]       = useState(false)
+  const [sucMsg, setSucMsg]   = useState('')
+
+  function handleUnlock(e) {
+    e.preventDefault()
+    if (passInput === API_KEY_PASSWORD) {
+      setUnlocked(true)
+      getSetting('global', 'riot_api_key').then(v => setRiotKey(v || ''))
+    } else {
+      setPassErr('❌ Hatalı şifre.')
+    }
+  }
 
   async function save() {
-    setErrMsg('')
     const val = riotKey.trim()
-    if (!val) {
-      await deleteSetting('global', 'riot_api_key')
-    } else {
-      await setSetting('global', 'riot_api_key', val)
-    }
+    if (!val) await deleteSetting('global', 'riot_api_key')
+    else      await setSetting('global', 'riot_api_key', val)
     setSucMsg('✅ API Key kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
+  }
+
+  if (!unlocked) {
+    return (
+      <div className={styles.card}>
+        <div className={styles.cardTitle}>🔑 API Key Ayarları</div>
+        <small style={{ color: 'rgba(212,245,192,0.4)', display: 'block', marginBottom: '1rem' }}>
+          Bu bölüme erişmek için ek şifre gereklidir.
+        </small>
+        <form onSubmit={handleUnlock}>
+          <input
+            className={`ipt ${styles.mb}`}
+            type="password"
+            placeholder="Şifre"
+            value={passInput}
+            onChange={e => { setPassInput(e.target.value); setPassErr('') }}
+            autoFocus
+          />
+          {passErr && <div className={styles.errMsg}>{passErr}</div>}
+          <button className={styles.btnGreen} type="submit">🔓 Giriş</button>
+        </form>
+      </div>
+    )
   }
 
   return (
@@ -55,8 +85,6 @@ export default function ApiKeyTab() {
           {show ? '🙈' : '👁️'}
         </button>
       </div>
-
-      {errMsg && <div className={styles.errMsg}>{errMsg}</div>}
 
       <button className={styles.btnGreen} onClick={save}>💾 Kaydet</button>
       {sucMsg && <div className={styles.sucMsg}>{sucMsg}</div>}
