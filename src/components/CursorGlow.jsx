@@ -43,36 +43,31 @@ function makePointer(color) {
   return `url("data:image/svg+xml,${svg}") 6 0, pointer`
 }
 
-let styleTag = null
-
-function setCursor(color) {
-  document.documentElement.style.cursor = makeCursor(color)
-
-  if (!styleTag) {
-    styleTag = document.createElement('style')
-    styleTag.id = 'cursor-pointer-override'
-    document.head.appendChild(styleTag)
-  }
-  styleTag.textContent = `a, button, [role="button"], label, select, [tabindex] { cursor: ${makePointer(color)} !important; }`
-}
-
 export default function CursorGlow() {
   useEffect(() => {
     if (window.matchMedia('(pointer: coarse)').matches) return
 
+    let currentColor = COLORS[0]
     let currentIdx = 0
+    let isPointer = false
     let transitionTimer = null
     let mainTimer = null
 
     const TRANSITION_MS = 600
     const FRAMES = 24
 
+    function applyColor(color) {
+      currentColor = color
+      document.documentElement.style.cursor = isPointer
+        ? makePointer(color)
+        : makeCursor(color)
+    }
+
     function transition(fromIdx, toIdx) {
       let frame = 0
       transitionTimer = setInterval(() => {
         frame++
-        const t = frame / FRAMES
-        setCursor(blendColor(COLORS[fromIdx], COLORS[toIdx], t))
+        applyColor(blendColor(COLORS[fromIdx], COLORS[toIdx], frame / FRAMES))
         if (frame >= FRAMES) {
           clearInterval(transitionTimer)
           currentIdx = toIdx
@@ -80,7 +75,15 @@ export default function CursorGlow() {
       }, TRANSITION_MS / FRAMES)
     }
 
-    setCursor(COLORS[0])
+    function onMouseOver(e) {
+      isPointer = window.getComputedStyle(e.target).cursor === 'pointer'
+      document.documentElement.style.cursor = isPointer
+        ? makePointer(currentColor)
+        : makeCursor(currentColor)
+    }
+
+    applyColor(COLORS[0])
+    document.addEventListener('mouseover', onMouseOver)
 
     mainTimer = setInterval(() => {
       const nextIdx = (currentIdx + 1) % COLORS.length
@@ -90,8 +93,8 @@ export default function CursorGlow() {
     return () => {
       clearInterval(mainTimer)
       clearInterval(transitionTimer)
+      document.removeEventListener('mouseover', onMouseOver)
       document.documentElement.style.cursor = ''
-      if (styleTag) { styleTag.remove(); styleTag = null }
     }
   }, [])
 
