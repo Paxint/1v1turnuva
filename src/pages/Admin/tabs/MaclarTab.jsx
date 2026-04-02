@@ -3,6 +3,46 @@ import { getBracket, saveBracket, subscribeToTable } from '../../../lib/supabase
 import styles from './MaclarTab.module.css'
 import tabStyles from './Tabs.module.css'
 
+function reshuffleBracket(bracket) {
+  // Round 0'daki tüm oyuncuları topla
+  const players = []
+  bracket.rounds[0].forEach(match => {
+    if (match.p1) players.push(match.p1)
+    if (match.p2) players.push(match.p2)
+  })
+
+  const n = players.length
+  const shuffled = [...players].sort(() => Math.random() - 0.5)
+
+  // Bye sayısını hesapla
+  let p = 1
+  while (p < n) p *= 2
+  const byes = p - n
+
+  // Derin kopya al, tüm round'ları sıfırla
+  const next = JSON.parse(JSON.stringify(bracket))
+  next.rounds.forEach((round, rIdx) => {
+    round.forEach(match => {
+      match.winner = null
+      if (rIdx > 0) { match.p1 = null; match.p2 = null }
+    })
+  })
+
+  // Round 0'ı yeniden dağıt
+  let pi = 0
+  for (let i = 0; i < next.rounds[0].length; i++) {
+    if (i < byes) {
+      next.rounds[0][i].p1 = shuffled[pi++]
+      next.rounds[0][i].p2 = null
+    } else {
+      next.rounds[0][i].p1 = shuffled[pi++]
+      next.rounds[0][i].p2 = shuffled[pi++] || null
+    }
+  }
+
+  return next
+}
+
 function roundName(rIdx, total) {
   const rev = total - 1 - rIdx
   if (rev === 0) return 'Final'
@@ -121,6 +161,15 @@ export default function MaclarTab() {
     setTimeout(() => setMsg(''), 2000)
   }
 
+  async function handleReshuffle() {
+    if (!window.confirm('Tüm karşılaşmalar yeniden karıştırılsın mı? Mevcut sonuçlar silinir.')) return
+    const next = reshuffleBracket(bracket)
+    setBracket(next)
+    await saveBracket(next)
+    setMsg('✅ Bracket yeniden karıştırıldı.')
+    setTimeout(() => setMsg(''), 2500)
+  }
+
   async function handleResetBracket() {
     if (!window.confirm('Tüm sonuçlar sıfırlanıp bracket başa döndürülsün mü?')) return
     const next = JSON.parse(JSON.stringify(bracket))
@@ -182,11 +231,14 @@ export default function MaclarTab() {
             </div>
           </div>
           {msg && <div className={styles.saveMsg}>{msg}</div>}
-          <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.2rem' }}>
-            <button className={tabStyles.btnOutline} onClick={handleResetBracket} style={{ flex: 1 }}>
+          <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.2rem', flexWrap: 'wrap' }}>
+            <button className={tabStyles.btnOutline} onClick={handleReshuffle} style={{ flex: 1, minWidth: '140px', color: '#00c2ff', borderColor: 'rgba(0,194,255,0.4)' }}>
+              🔀 Randomize
+            </button>
+            <button className={tabStyles.btnOutline} onClick={handleResetBracket} style={{ flex: 1, minWidth: '140px' }}>
               🔄 Başa Döndür
             </button>
-            <button className={tabStyles.btnOutline} onClick={handleClearBracket} style={{ flex: 1, color: '#ff6060', borderColor: 'rgba(255,96,96,0.4)' }}>
+            <button className={tabStyles.btnOutline} onClick={handleClearBracket} style={{ flex: 1, minWidth: '140px', color: '#ff6060', borderColor: 'rgba(255,96,96,0.4)' }}>
               🗑️ Bracket Temizle
             </button>
           </div>
