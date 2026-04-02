@@ -23,6 +23,12 @@ export default function Kayit() {
     if (!kick) { setKickErr('Bu alan zorunludur.'); return }
     if (!lol)  { setLolErr('Bu alan zorunludur.'); return }
 
+    // LoL nick format: OyuncuAdı#TAG
+    const lolParts = lol.split('#')
+    if (lolParts.length !== 2 || !lolParts[0].trim() || !lolParts[1].trim()) {
+      setLolErr('❌ Geçersiz format. Örnek: OyuncuAdı#TR1'); return
+    }
+
     setLoading(true)
 
     // Duplicate check
@@ -73,7 +79,7 @@ export default function Kayit() {
             <input
               className="ipt"
               type="text"
-              placeholder="LoL kullanıcı adın"
+              placeholder="OyuncuAdı#TR1"
               value={lolNick}
               onChange={e => setLolNick(e.target.value)}
             />
