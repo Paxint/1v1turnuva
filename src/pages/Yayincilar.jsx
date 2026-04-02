@@ -10,9 +10,22 @@ const DEFAULT_BROADCASTERS = [
   { name: 'Redjangu',  subtitle: 'Yayıncı', image_url: '', sort_order: 2, effect: 'none' },
 ]
 
+function extractKickUsername(url) {
+  if (!url) return null
+  try {
+    const u = new URL(url)
+    if (!u.hostname.includes('kick.com')) return null
+    const parts = u.pathname.split('/').filter(Boolean)
+    return parts[0] || null
+  } catch {
+    return null
+  }
+}
+
 export default function Yayincilar() {
   const { theme } = useTheme()
   const [broadcasters, setBroadcasters] = useState(DEFAULT_BROADCASTERS)
+  const [liveStatus, setLiveStatus] = useState({})
   const [hoveredEffect, setHoveredEffect] = useState('none')
   const [isHovering, setIsHovering] = useState(false)
 
@@ -22,11 +35,28 @@ export default function Yayincilar() {
     else setBroadcasters(DEFAULT_BROADCASTERS)
   }, [theme])
 
+  const checkLive = useCallback(async (list) => {
+    const usernames = list
+      .map(b => extractKickUsername(b.link_url))
+      .filter(Boolean)
+    if (usernames.length === 0) return
+    try {
+      const res = await fetch(`/api/kick-live?usernames=${usernames.join(',')}`)
+      if (!res.ok) return
+      const data = await res.json()
+      setLiveStatus(data)
+    } catch { /* sessizce geç */ }
+  }, [])
+
   useEffect(() => {
     load()
     const unsub = subscribeToTable('broadcasters', load)
     return unsub
   }, [load])
+
+  useEffect(() => {
+    checkLive(broadcasters)
+  }, [broadcasters, checkLive])
 
   function handleEnter(effect) {
     setHoveredEffect(effect || 'none')
@@ -46,6 +76,8 @@ export default function Yayincilar() {
 
       <div className={`${styles.cards} fade-up-1`}>
         {broadcasters.map((b, i) => {
+          const kickUser = extractKickUsername(b.link_url)
+          const isLive = kickUser ? !!liveStatus[kickUser] : false
           const inner = (
             <>
               <div className={styles.cardImgWrap}>
@@ -53,6 +85,12 @@ export default function Yayincilar() {
                   ? <img className={styles.cardImg} src={b.image_url} alt={b.name} />
                   : <div className={styles.cardImgPlaceholder}>🎮</div>
                 }
+                {isLive && (
+                  <div className={styles.liveBadge}>
+                    <span className={styles.liveDot} />
+                    YAYINDA
+                  </div>
+                )}
               </div>
               <div className={styles.cardBody}>
                 <div className={styles.cardName}>{b.name}</div>
