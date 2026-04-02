@@ -267,8 +267,8 @@
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
-  width: calc(50px + var(--flame, 0) * 80px);
-  height: calc(40px + var(--flame, 0) * 110px);
+  width: calc(28px + var(--flame-v, 0) * 102px);
+  height: calc(28px + var(--flame-v, 0) * 122px);
   background: radial-gradient(
     ellipse at 50% 100%,
     rgba(255, 210, 0, 0.9) 0%,
@@ -276,8 +276,8 @@
     rgba(200, 25,  0, 0.45) 60%,
     transparent 100%
   );
-  opacity: var(--flame-v, 0);
-  filter: blur(calc(4px + var(--flame, 0) * 9px));
+  opacity: 0.85;
+  filter: blur(calc(3px + var(--flame-v, 0) * 8px));
   animation: flameFlicker 0.65s ease-in-out infinite;
   pointer-events: none;
   z-index: 0;
