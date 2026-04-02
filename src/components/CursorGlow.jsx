@@ -1,81 +1,79 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 
 const COLORS = [
-  { border: '#53fc18', shadow: 'rgba(83,252,24,0.5)'   }, // pax
-  { border: '#00c2ff', shadow: 'rgba(0,194,255,0.5)'   }, // raku
-  { border: '#d42020', shadow: 'rgba(212,32,32,0.5)'   }, // redjangu
+  '#53fc18', // pax
+  '#00c2ff', // raku
+  '#d42020', // redjangu
 ]
 
-export default function CursorGlow() {
-  const dotRef  = useRef(null)
-  const posRef  = useRef({ x: -200, y: -200 })
-  const [idx,     setIdx]     = useState(0)
-  const [visible, setVisible] = useState(false)
-  const [fading,  setFading]  = useState(false)
+function hexToRgb(hex) {
+  return [
+    parseInt(hex.slice(1, 3), 16),
+    parseInt(hex.slice(3, 5), 16),
+    parseInt(hex.slice(5, 7), 16),
+  ]
+}
 
-  // Mouse takibi
-  useEffect(() => {
-    const onMove = (e) => {
-      posRef.current = { x: e.clientX, y: e.clientY }
-      setVisible(true)
-    }
-    const onLeave = () => setVisible(false)
-    window.addEventListener('mousemove', onMove)
-    document.addEventListener('mouseleave', onLeave)
-    return () => {
-      window.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mouseleave', onLeave)
-    }
-  }, [])
+function blendColor(c1, c2, t) {
+  const [r1, g1, b1] = hexToRgb(c1)
+  const [r2, g2, b2] = hexToRgb(c2)
+  const r = Math.round(r1 + (r2 - r1) * t).toString(16).padStart(2, '0')
+  const g = Math.round(g1 + (g2 - g1) * t).toString(16).padStart(2, '0')
+  const b = Math.round(b1 + (b2 - b1) * t).toString(16).padStart(2, '0')
+  return `#${r}${g}${b}`
+}
 
-  // Pozisyon animasyonu (rAF)
-  useEffect(() => {
-    let raf
-    const tick = () => {
-      if (dotRef.current) {
-        dotRef.current.style.left = posRef.current.x + 'px'
-        dotRef.current.style.top  = posRef.current.y + 'px'
-      }
-      raf = requestAnimationFrame(tick)
-    }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [])
-
-  // Renk döngüsü — 2 saniyede bir fade out → renk değiş → fade in
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setFading(true)
-      setTimeout(() => {
-        setIdx(i => (i + 1) % COLORS.length)
-        setFading(false)
-      }, 500)
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
-  // Dokunmatik cihazlarda gösterme
-  if (typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches) return null
-
-  const { border, shadow } = COLORS[idx]
-
-  return (
-    <div
-      ref={dotRef}
-      style={{
-        position:      'fixed',
-        pointerEvents: 'none',
-        zIndex:        9999,
-        width:         18,
-        height:        18,
-        borderRadius:  '50%',
-        border:        `1.5px solid ${border}`,
-        boxShadow:     `0 0 6px ${shadow}, 0 0 14px ${shadow}`,
-        transform:     'translate(-50%, -50%)',
-        opacity:       !visible || fading ? 0 : 0.85,
-        transition:    'opacity 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease',
-        borderColor:   border,
-      }}
-    />
+function makeCursor(color) {
+  const svg = encodeURIComponent(
+    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="22" viewBox="0 0 16 22">
+      <path d="M0 0 L0 18 L4 13.5 L7 21 L9 20 L6 12.5 L12 12.5 Z"
+        fill="${color}" stroke="#000" stroke-width="1.2" stroke-linejoin="round"/>
+    </svg>`
   )
+  return `url("data:image/svg+xml,${svg}") 0 0, auto`
+}
+
+function setCursor(color) {
+  document.documentElement.style.cursor = makeCursor(color)
+}
+
+export default function CursorGlow() {
+  useEffect(() => {
+    if (window.matchMedia('(pointer: coarse)').matches) return
+
+    let currentIdx = 0
+    let transitionTimer = null
+    let mainTimer = null
+
+    const TRANSITION_MS = 600
+    const FRAMES = 24
+
+    function transition(fromIdx, toIdx) {
+      let frame = 0
+      transitionTimer = setInterval(() => {
+        frame++
+        const t = frame / FRAMES
+        setCursor(blendColor(COLORS[fromIdx], COLORS[toIdx], t))
+        if (frame >= FRAMES) {
+          clearInterval(transitionTimer)
+          currentIdx = toIdx
+        }
+      }, TRANSITION_MS / FRAMES)
+    }
+
+    setCursor(COLORS[0])
+
+    mainTimer = setInterval(() => {
+      const nextIdx = (currentIdx + 1) % COLORS.length
+      transition(currentIdx, nextIdx)
+    }, 2000)
+
+    return () => {
+      clearInterval(mainTimer)
+      clearInterval(transitionTimer)
+      document.documentElement.style.cursor = ''
+    }
+  }, [])
+
+  return null
 }
