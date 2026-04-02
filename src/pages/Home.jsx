@@ -95,6 +95,12 @@ export default function Home() {
   const animCount = useCountUp(regCount)
   const countdown = useCountdown(countdownTarget)
 
+  const FLAME_MIN = 8
+  const FLAME_MAX = 64
+  const flameIntensity = animCount < FLAME_MIN
+    ? 0
+    : Math.min(1, (animCount - FLAME_MIN) / (FLAME_MAX - FLAME_MIN))
+
   return (
     <section className={styles.hero}>
       <div className={styles.decoL} aria-hidden />
@@ -137,7 +143,8 @@ export default function Home() {
 
       {/* Stats strip */}
       <div className={`${styles.statsStrip} fade-up-3`}>
-        <div className={styles.statItem}>
+        <div className={`${styles.statItem} ${styles.statItemFire}`} style={{ '--flame': flameIntensity }}>
+          {flameIntensity > 0 && <span className={styles.flame} aria-hidden />}
           <span className={styles.statNum}>{animCount}</span>
           <span className={styles.statLabel}>Kayıtlı Oyuncu</span>
         </div>

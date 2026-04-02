@@ -140,7 +140,7 @@
   border: 1px solid var(--border);
   border-radius: 3px;
   background: rgba(83,252,24,0.02);
-  overflow: hidden;
+  overflow: visible;
   width: 100%; max-width: 680px;
   animation: fadeUp3 0.6s ease both;
   animation-delay: 0.55s;
@@ -235,6 +235,51 @@
   color: rgba(83,252,24,0.3);
   line-height: 1.1;
   padding-bottom: 4px;
+}
+
+/* ─── Fire effect ─── */
+@keyframes flameFlicker {
+  0%   { transform: translateX(-50%) scaleX(0.90) scaleY(0.96); }
+  25%  { transform: translateX(-50%) scaleX(1.06) scaleY(1.04); }
+  50%  { transform: translateX(-50%) scaleX(0.95) scaleY(0.98); }
+  75%  { transform: translateX(-50%) scaleX(1.08) scaleY(1.02); }
+  100% { transform: translateX(-50%) scaleX(0.92) scaleY(1.05); }
+}
+
+.statItemFire {
+  overflow: visible;
+}
+
+.statItemFire .statNum,
+.statItemFire .statLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.statItemFire .statNum {
+  text-shadow:
+    0 0 calc(var(--flame, 0) * 18px) rgba(255, 140, 0, calc(var(--flame, 0) * 0.9)),
+    0 0 calc(var(--flame, 0) * 8px)  rgba(255, 220, 0, calc(var(--flame, 0) * 0.6));
+}
+
+.flame {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(50px + var(--flame, 0) * 80px);
+  height: calc(40px + var(--flame, 0) * 110px);
+  background: radial-gradient(
+    ellipse at 50% 100%,
+    rgba(255, 210, 0,  calc(var(--flame, 0) * 0.85)) 0%,
+    rgba(255, 100, 0,  calc(var(--flame, 0) * 0.65)) 30%,
+    rgba(200, 25,  0,  calc(var(--flame, 0) * 0.40)) 60%,
+    transparent 100%
+  );
+  filter: blur(calc(4px + var(--flame, 0) * 9px));
+  animation: flameFlicker 0.65s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
 }
 
 @media (max-width: 600px) {
