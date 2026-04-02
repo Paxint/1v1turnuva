@@ -36,17 +36,29 @@ export default function Yayincilar() {
   }, [theme])
 
   const checkLive = useCallback(async (list) => {
-    const usernames = list
-      .map(b => extractKickUsername(b.link_url))
-      .filter(Boolean)
-    if (usernames.length === 0) return
-    try {
-      const res = await fetch(`/api/kick-live?usernames=${usernames.join(',')}`)
-      if (!res.ok) return
-      const data = await res.json()
-      console.log('[kick-live] response:', data)
-      setLiveStatus(data)
-    } catch (e) { console.warn('[kick-live] hata:', e) }
+    const entries = list
+      .map(b => ({ username: extractKickUsername(b.link_url) }))
+      .filter(({ username }) => username)
+    if (entries.length === 0) return
+
+    const statuses = {}
+    await Promise.all(
+      entries.map(async ({ username }) => {
+        try {
+          const r = await fetch(
+            `https://kick.com/api/v2/channels/${encodeURIComponent(username)}`,
+            { headers: { 'Accept': 'application/json' } }
+          )
+          if (!r.ok) { statuses[username] = false; return }
+          const data = await r.json()
+          statuses[username] = !!data?.livestream
+        } catch {
+          statuses[username] = false
+        }
+      })
+    )
+    console.log('[kick-live] response:', statuses)
+    setLiveStatus(statuses)
   }, [])
 
   useEffect(() => {
