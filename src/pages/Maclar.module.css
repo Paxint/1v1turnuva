@@ -140,6 +140,11 @@
   flex: 1;
 }
 
+/* Gap between match pairs */
+.matchSlot:nth-child(odd):not(:first-child) {
+  margin-top: 0.5rem;
+}
+
 /* ─── Match slot + connectors ─── */
 .matchSlot {
   display: flex;
