@@ -27,7 +27,7 @@ const EFFECT_OPTIONS = [
   { value: 'blood',     label: '🩸 Kan'          },
 ]
 
-export default function YayincilarTab({ theme }) {
+export default function YayincilarTab() {
   const [yayincilar, setYayincilar] = useState([])
   const [sucMsg, setSucMsg] = useState('')
   const [errMsg, setErrMsg] = useState('')
@@ -35,7 +35,7 @@ export default function YayincilarTab({ theme }) {
 
   useEffect(() => {
     async function load() {
-      const rows = await getBroadcasters(theme)
+      const rows = await getBroadcasters()
       if (rows.length > 0) {
         setYayincilar(rows.map(r => ({ name: r.name, subtitle: r.subtitle, image_url: r.image_url, effect: r.effect || 'none', link_url: r.link_url || '' })))
       } else {
@@ -47,7 +47,7 @@ export default function YayincilarTab({ theme }) {
       }
     }
     load()
-  }, [theme])
+  }, [])
 
   function update(index, field, value) {
     setYayincilar(prev => prev.map((y, i) => i === index ? { ...y, [field]: value } : y))
@@ -67,7 +67,7 @@ export default function YayincilarTab({ theme }) {
     setUploading(index)
     try {
       const ext = file.name.split('.').pop() || 'jpg'
-      const publicUrl = await uploadImage(`broadcasters/${theme}_${index}.${ext}`, file)
+      const publicUrl = await uploadImage(`broadcasters/shared_${index}_${Date.now()}.${ext}`, file)
       update(index, 'image_url', publicUrl)
     } catch (err) {
       setErrMsg('❌ Yükleme hatası: ' + err.message)
@@ -80,7 +80,7 @@ export default function YayincilarTab({ theme }) {
   async function save() {
     setErrMsg('')
     try {
-      await saveBroadcasters(theme, yayincilar)
+      await saveBroadcasters(yayincilar)
       setSucMsg('✅ Kaydedildi!')
       setTimeout(() => setSucMsg(''), 3000)
     } catch {
@@ -91,7 +91,7 @@ export default function YayincilarTab({ theme }) {
 
   return (
     <div className={styles.card}>
-      <div className={styles.cardTitle}>🎮 Yayıncılar Sayfası (Aktif Yayıncı)</div>
+      <div className={styles.cardTitle}>🎮 Yayıncılar Sayfası (Tüm Profiller İçin Ortak)</div>
 
       <div className={styles.yayinciGrid}>
         {yayincilar.map((y, i) => (

@@ -47,25 +47,23 @@ export async function deleteSetting(broadcaster, key) {
 
 // ─── Broadcasters ────────────────────────────────────────────────────────────
 
-export async function getBroadcasters(broadcasterKey) {
+export async function getBroadcasters() {
   if (!isConfigured) return []
   try {
-    let q = supabase.from('broadcasters').select('*').order('sort_order')
-    if (broadcasterKey) q = q.eq('broadcaster_key', broadcasterKey)
-    const { data, error } = await q
+    const { data, error } = await supabase.from('broadcasters').select('*').eq('broadcaster_key', 'shared').order('sort_order')
     logErr('getBroadcasters', error)
     return data ?? []
   } catch (e) { logErr('getBroadcasters', e); return [] }
 }
 
-export async function saveBroadcasters(broadcasterKey, list) {
+export async function saveBroadcasters(list) {
   if (!isConfigured) return
-  const { error: delErr } = await supabase.from('broadcasters').delete().eq('broadcaster_key', broadcasterKey)
+  const { error: delErr } = await supabase.from('broadcasters').delete().eq('broadcaster_key', 'shared')
   logErr('saveBroadcasters(delete)', delErr)
   if (list.length === 0) return
   const { error: insErr } = await supabase.from('broadcasters').insert(
     list.map((b, i) => ({
-      broadcaster_key: broadcasterKey,
+      broadcaster_key: 'shared',
       sort_order: i,
       name: b.name,
       subtitle: b.subtitle,

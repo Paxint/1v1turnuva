@@ -34,7 +34,7 @@ export default function PosterlerTab({ theme }) {
     setUploading(true)
     try {
       const ext = file.name.split('.').pop() || 'jpg'
-      const publicUrl = await uploadImage(`posters/${theme}.${ext}`, file)
+      const publicUrl = await uploadImage(`posters/${theme}_${Date.now()}.${ext}`, file)
       await savePoster(publicUrl)
     } catch (err) {
       setSucMsg('❌ Yükleme hatası: ' + err.message)

@@ -72,7 +72,7 @@ export default function Admin() {
         {/* Tab Content */}
         {activeTab === 'genel'      && <GenelTab theme={theme} setTheme={setTheme} />}
         {activeTab === 'posterler'  && <PosterlerTab theme={theme} />}
-        {activeTab === 'yayincilar' && <YayincilarTab theme={theme} />}
+        {activeTab === 'yayincilar' && <YayincilarTab />}
         {activeTab === 'kurallar'   && <KurallarTab theme={theme} />}
         {activeTab === 'kayitlar'   && <KayitlarTab />}
         {activeTab === 'maclar'     && <MaclarTab />}

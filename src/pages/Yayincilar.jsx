@@ -1,5 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useTheme } from '../context/ThemeContext'
 import { getBroadcasters, subscribeToTable } from '../lib/supabase'
 import HoverEffect from '../components/HoverEffect'
 import styles from './Yayincilar.module.css'
@@ -23,17 +22,16 @@ function extractKickUsername(url) {
 }
 
 export default function Yayincilar() {
-  const { theme } = useTheme()
   const [broadcasters, setBroadcasters] = useState(DEFAULT_BROADCASTERS)
   const [liveStatus, setLiveStatus] = useState({})
   const [hoveredEffect, setHoveredEffect] = useState('none')
   const [isHovering, setIsHovering] = useState(false)
 
   const load = useCallback(async () => {
-    const rows = await getBroadcasters(theme)
+    const rows = await getBroadcasters()
     if (rows.length > 0) setBroadcasters(rows)
     else setBroadcasters(DEFAULT_BROADCASTERS)
-  }, [theme])
+  }, [])
 
   const checkLive = useCallback(async (list) => {
     const entries = list
