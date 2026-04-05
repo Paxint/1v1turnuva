@@ -119,8 +119,8 @@
   flex: 1;
 }
 
-/* Gap between match pairs */
-.matchSlot:nth-child(odd):not(:first-child) {
+/* Gap between every match */
+.matchSlot:not(:first-child) {
   margin-top: 0.5rem;
 }
 
