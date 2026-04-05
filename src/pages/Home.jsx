@@ -104,95 +104,110 @@ export default function Home() {
     : Math.min(1, (animCount - FLAME_MIN) / (FLAME_MAX - FLAME_MIN))
   const flameVisual = flameIntensity > 0 ? Math.pow(flameIntensity, 0.4) : 0
 
+  const hasImage = posterSrc && !imgError
+
   return (
     <section className={styles.hero}>
       <div className={styles.decoL} aria-hidden />
       <div className={styles.decoR} aria-hidden />
 
-      {/* Live badge */}
-      <div className={`${styles.heroBadge} fade-up`}>
-        <span className={styles.liveDot} />
-        {badge}
-      </div>
+      <div className={`${styles.heroInner} ${!hasImage ? styles.noImage : ''}`}>
 
-      {/* Poster */}
-      {posterSrc && !imgError && (
-        <div className={`${styles.posterFrame} fade-up-1`}>
-          <div className={styles.posterInner}>
-            <span className={styles.cornerTL} aria-hidden />
-            <span className={styles.cornerTR} aria-hidden />
-            <span className={styles.cornerBL} aria-hidden />
-            <span className={styles.cornerBR} aria-hidden />
-            <img
-              key={posterSrc}
-              className={styles.poster}
-              src={posterSrc}
-              alt="Turnuva Posteri"
-              onError={() => setImgError(true)}
-            />
+        {/* ── Left column ── */}
+        <div className={styles.heroLeft}>
+
+          <div className={`${styles.heroBadge} fade-up`}>
+            <span className={styles.liveDot} />
+            {badge}
           </div>
-        </div>
-      )}
 
-      {/* CTA buttons */}
-      <div className={`${styles.heroCta} fade-up-2`}>
-        <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
-          Kick'te Takip Et
-        </a>
-        <Link className="btn btn-outline" to="/kayit">
-          Turnuvaya Katıl
-        </Link>
-      </div>
-
-      {/* Stats strip */}
-      <div className={`${styles.statsStrip} fade-up-3`}>
-        <div className={`${styles.statItem} ${styles.statItemFire}`} style={{ '--flame': flameIntensity, '--flame-v': flameVisual }}>
-          {flameIntensity > 0 && <span className={styles.flame} aria-hidden />}
-          <span className={styles.statNum}>{animCount}</span>
-          <span className={styles.statLabel}>Kayıtlı Oyuncu</span>
-        </div>
-
-        <div className={styles.statDivider} />
-
-        {champion ? (
-          <div className={styles.statItem}>
-            <span className={`${styles.statNum} ${styles.statChamp}`}>{champion}</span>
-            <span className={styles.statLabel}>Son Şampiyon</span>
+          <div className={`${styles.heroHeadline} fade-up`}>
+            <span className={styles.h1}>1<em>V</em>1</span>
+            <span className={styles.h2}>TURNUVA</span>
           </div>
-        ) : (
-          <div className={styles.statItem}>
-            <span className={`${styles.statNum} ${styles.statMystery}`}>???</span>
-            <span className={styles.statLabel}>Sıradaki Şampiyon</span>
-          </div>
-        )}
 
-        {countdown && !countdown.ended && (
-          <>
+          <div className={`${styles.heroCta} fade-up-1`}>
+            <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
+              Kick'te Takip Et
+            </a>
+            <Link className="btn btn-outline" to="/kayit">
+              Turnuvaya Katıl
+            </Link>
+          </div>
+
+          <div className={`${styles.statsStrip} fade-up-2`}>
+            <div className={`${styles.statItem} ${styles.statItemFire}`} style={{ '--flame': flameIntensity, '--flame-v': flameVisual }}>
+              {flameIntensity > 0 && <span className={styles.flame} aria-hidden />}
+              <span className={styles.statNum}>{animCount}</span>
+              <span className={styles.statLabel}>Kayıtlı Oyuncu</span>
+            </div>
+
             <div className={styles.statDivider} />
-            <div className={styles.statItem}>
-              <div className={styles.countdown}>
-                <CountdownUnit value={countdown.days}  label="GÜN" />
-                <span className={styles.cdSep}>:</span>
-                <CountdownUnit value={countdown.hours} label="SAAT" />
-                <span className={styles.cdSep}>:</span>
-                <CountdownUnit value={countdown.mins}  label="DAK" />
-                <span className={styles.cdSep}>:</span>
-                <CountdownUnit value={countdown.secs}  label="SAN" />
+
+            {champion ? (
+              <div className={styles.statItem}>
+                <span className={`${styles.statNum} ${styles.statChamp}`}>{champion}</span>
+                <span className={styles.statLabel}>Son Şampiyon</span>
               </div>
-              <span className={styles.statLabel}>Turnuvaya Kalan</span>
+            ) : (
+              <div className={styles.statItem}>
+                <span className={`${styles.statNum} ${styles.statMystery}`}>???</span>
+                <span className={styles.statLabel}>Sıradaki Şampiyon</span>
+              </div>
+            )}
+
+            {countdown && !countdown.ended && (
+              <>
+                <div className={styles.statDivider} />
+                <div className={styles.statItem}>
+                  <div className={styles.countdown}>
+                    <CountdownUnit value={countdown.days}  label="GÜN" />
+                    <span className={styles.cdSep}>:</span>
+                    <CountdownUnit value={countdown.hours} label="SAAT" />
+                    <span className={styles.cdSep}>:</span>
+                    <CountdownUnit value={countdown.mins}  label="DAK" />
+                    <span className={styles.cdSep}>:</span>
+                    <CountdownUnit value={countdown.secs}  label="SAN" />
+                  </div>
+                  <span className={styles.statLabel}>Turnuvaya Kalan</span>
+                </div>
+              </>
+            )}
+
+            {countdown?.ended && (
+              <>
+                <div className={styles.statDivider} />
+                <div className={styles.statItem}>
+                  <span className={`${styles.statNum} ${styles.statLive}`}>CANLI</span>
+                  <span className={styles.statLabel}>Turnuva Başladı</span>
+                </div>
+              </>
+            )}
+          </div>
+
+        </div>
+
+        {/* ── Right column: poster ── */}
+        {hasImage && (
+          <div className={`${styles.heroRight} fade-up-1`}>
+            <div className={styles.posterFrame}>
+              <div className={styles.posterInner}>
+                <span className={styles.cornerTL} aria-hidden />
+                <span className={styles.cornerTR} aria-hidden />
+                <span className={styles.cornerBL} aria-hidden />
+                <span className={styles.cornerBR} aria-hidden />
+                <img
+                  key={posterSrc}
+                  className={styles.poster}
+                  src={posterSrc}
+                  alt="Turnuva Posteri"
+                  onError={() => setImgError(true)}
+                />
+              </div>
             </div>
-          </>
+          </div>
         )}
 
-        {countdown?.ended && (
-          <>
-            <div className={styles.statDivider} />
-            <div className={styles.statItem}>
-              <span className={`${styles.statNum} ${styles.statLive}`}>CANLI</span>
-              <span className={styles.statLabel}>Turnuva Başladı</span>
-            </div>
-          </>
-        )}
       </div>
     </section>
   )
