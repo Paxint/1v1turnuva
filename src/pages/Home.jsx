@@ -166,7 +166,7 @@ export default function Home() {
 
         {/* ── Right column: poster ── */}
         {hasImage && (
-          <div className={`${styles.heroRight} fade-up-1`}>
+          <div className={styles.heroRight}>
             <div className={styles.posterFrame}>
               <div className={styles.posterInner}>
                 <span className={styles.cornerTL} aria-hidden />
