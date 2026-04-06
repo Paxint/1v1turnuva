@@ -1,15 +1,16 @@
-import { useEffect } from 'react'
+import { useEffect, lazy, Suspense } from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import CursorGlow from './components/CursorGlow'
-import Home from './pages/Home'
-import Yayincilar from './pages/Yayincilar'
-import Kurallar from './pages/Kurallar'
-import Kayit from './pages/Kayit'
-import Maclar from './pages/Maclar'
-import Cark from './pages/Cark'
-import Admin from './pages/Admin'
+
+const Home      = lazy(() => import('./pages/Home'))
+const Yayincilar = lazy(() => import('./pages/Yayincilar'))
+const Kurallar  = lazy(() => import('./pages/Kurallar'))
+const Kayit     = lazy(() => import('./pages/Kayit'))
+const Maclar    = lazy(() => import('./pages/Maclar'))
+const Cark      = lazy(() => import('./pages/Cark'))
+const Admin     = lazy(() => import('./pages/Admin'))
 
 function Layout() {
   return (
@@ -32,16 +33,18 @@ export default function App() {
   }, [])
 
   return (
-    <Routes>
-      <Route element={<Layout />}>
-        <Route path="/" element={<Home />} />
-        <Route path="/yayincilar" element={<Yayincilar />} />
-        <Route path="/kurallar" element={<Kurallar />} />
-        <Route path="/maclar" element={<Maclar />} />
-        <Route path="/kayit" element={<Kayit />} />
-        <Route path="/cark" element={<Cark />} />
-      </Route>
-      <Route path="/admin" element={<Admin />} />
-    </Routes>
+    <Suspense fallback={null}>
+      <Routes>
+        <Route element={<Layout />}>
+          <Route path="/" element={<Home />} />
+          <Route path="/yayincilar" element={<Yayincilar />} />
+          <Route path="/kurallar" element={<Kurallar />} />
+          <Route path="/maclar" element={<Maclar />} />
+          <Route path="/kayit" element={<Kayit />} />
+          <Route path="/cark" element={<Cark />} />
+        </Route>
+        <Route path="/admin" element={<Admin />} />
+      </Routes>
+    </Suspense>
   )
 }
