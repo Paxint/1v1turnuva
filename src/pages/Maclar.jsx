@@ -139,6 +139,7 @@ export default function Maclar() {
             </div>
           )}
           <div className={styles.bracketScroll} ref={scrollRef}>
+
             <div className={styles.bracket} ref={bracketRef}>
               {bracket.rounds.map((round, rIdx) => (
                 <div className={styles.round} key={rIdx} style={{ animationDelay: `${rIdx * 0.1}s` }}>
@@ -160,6 +161,13 @@ export default function Maclar() {
               ))}
             </div>
           </div>
+
+          {bracket.thirdPlace && (
+            <div className={`${styles.thirdPlaceSection} fade-up`}>
+              <div className={styles.thirdPlaceLabel}>3. Yer Maçı</div>
+              <MatchCard match={bracket.thirdPlace} />
+            </div>
+          )}
         </>
       )}
     </div>

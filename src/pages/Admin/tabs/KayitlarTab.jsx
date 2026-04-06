@@ -32,7 +32,10 @@ function buildBracket(players) {
       rounds[0][i].p2 = shuffled[pi++]
     }
   }
-  return { rounds }
+  const thirdPlace = numRounds >= 2
+    ? { id: 'third-place', p1: null, p2: null, winner: null }
+    : null
+  return { rounds, thirdPlace }
 }
 
 export default function KayitlarTab() {

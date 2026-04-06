@@ -4,22 +4,16 @@ import styles from './MaclarTab.module.css'
 import tabStyles from './Tabs.module.css'
 
 function reshuffleBracket(bracket) {
-  // Round 0'daki tüm oyuncuları topla
   const players = []
   bracket.rounds[0].forEach(match => {
     if (match.p1) players.push(match.p1)
     if (match.p2) players.push(match.p2)
   })
-
   const n = players.length
   const shuffled = [...players].sort(() => Math.random() - 0.5)
-
-  // Bye sayısını hesapla
   let p = 1
   while (p < n) p *= 2
   const byes = p - n
-
-  // Derin kopya al, tüm round'ları sıfırla
   const next = JSON.parse(JSON.stringify(bracket))
   next.rounds.forEach((round, rIdx) => {
     round.forEach(match => {
@@ -27,8 +21,7 @@ function reshuffleBracket(bracket) {
       if (rIdx > 0) { match.p1 = null; match.p2 = null }
     })
   })
-
-  // Round 0'ı yeniden dağıt
+  if (next.thirdPlace) { next.thirdPlace.p1 = null; next.thirdPlace.p2 = null; next.thirdPlace.winner = null }
   let pi = 0
   for (let i = 0; i < next.rounds[0].length; i++) {
     if (i < byes) {
@@ -39,7 +32,6 @@ function reshuffleBracket(bracket) {
       next.rounds[0][i].p2 = shuffled[pi++] || null
     }
   }
-
   return next
 }
 
@@ -126,17 +118,30 @@ export default function MaclarTab() {
     return unsub
   }, [load])
 
+  const sfIdx = bracket ? bracket.rounds.length - 2 : -1
+
   async function handleSelect(rIdx, mIdx, winner) {
     const next = JSON.parse(JSON.stringify(bracket))
     const match = next.rounds[rIdx][mIdx]
     if (match.winner && match.winner !== winner) {
       clearWinner(next.rounds, rIdx, mIdx)
+      if (next.thirdPlace && rIdx === sfIdx) {
+        if (mIdx === 0) next.thirdPlace.p1 = null
+        else if (mIdx === 1) next.thirdPlace.p2 = null
+        next.thirdPlace.winner = null
+      }
     }
     next.rounds[rIdx][mIdx].winner = winner
     if (rIdx + 1 < next.rounds.length) {
       const nm = Math.floor(mIdx / 2)
       const slot = mIdx % 2 === 0 ? 'p1' : 'p2'
       next.rounds[rIdx + 1][nm][slot] = winner
+    }
+    // Yarı final kaybedeni 3. yer maçına yaz
+    if (next.thirdPlace && rIdx === sfIdx) {
+      const loser = winner === match.p1 ? match.p2 : match.p1
+      if (mIdx === 0) next.thirdPlace.p1 = loser || null
+      else if (mIdx === 1) next.thirdPlace.p2 = loser || null
     }
     setBracket(next)
     await saveBracket(next)
@@ -147,6 +152,29 @@ export default function MaclarTab() {
   async function handleClear(rIdx, mIdx) {
     const next = JSON.parse(JSON.stringify(bracket))
     clearWinner(next.rounds, rIdx, mIdx)
+    if (next.thirdPlace && rIdx === sfIdx) {
+      if (mIdx === 0) next.thirdPlace.p1 = null
+      else if (mIdx === 1) next.thirdPlace.p2 = null
+      next.thirdPlace.winner = null
+    }
+    setBracket(next)
+    await saveBracket(next)
+    setMsg('✅ Kaydedildi')
+    setTimeout(() => setMsg(''), 2000)
+  }
+
+  async function handleSelectThirdPlace(winner) {
+    const next = JSON.parse(JSON.stringify(bracket))
+    next.thirdPlace.winner = winner
+    setBracket(next)
+    await saveBracket(next)
+    setMsg('✅ Kaydedildi')
+    setTimeout(() => setMsg(''), 2000)
+  }
+
+  async function handleClearThirdPlace() {
+    const next = JSON.parse(JSON.stringify(bracket))
+    next.thirdPlace.winner = null
     setBracket(next)
     await saveBracket(next)
     setMsg('✅ Kaydedildi')
@@ -179,6 +207,7 @@ export default function MaclarTab() {
         if (rIdx > 0) { match.p1 = null; match.p2 = null }
       })
     })
+    if (next.thirdPlace) { next.thirdPlace.p1 = null; next.thirdPlace.p2 = null; next.thirdPlace.winner = null }
     setBracket(next)
     await saveBracket(next)
     setMsg('✅ Bracket başa döndürüldü.')
@@ -230,6 +259,17 @@ export default function MaclarTab() {
               ))}
             </div>
           </div>
+          {bracket.thirdPlace && (
+            <div className={styles.thirdPlaceSection}>
+              <div className={styles.thirdPlaceLabel}>3. YER MAÇI</div>
+              <MatchCard
+                match={bracket.thirdPlace}
+                onSelect={(w) => handleSelectThirdPlace(w)}
+                onClear={() => handleClearThirdPlace()}
+              />
+            </div>
+          )}
+
           {msg && <div className={styles.saveMsg}>{msg}</div>}
           <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1.2rem', flexWrap: 'wrap' }}>
             <button className={tabStyles.btnOutline} onClick={handleReshuffle} style={{ flex: 1, minWidth: '140px', color: '#00c2ff', borderColor: 'rgba(0,194,255,0.4)' }}>

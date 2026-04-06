@@ -368,3 +368,29 @@
   height: 1px;
   background: var(--border);
 }
+
+/* ─── 3rd place section ─── */
+.thirdPlaceSection {
+  margin-top: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.6rem;
+}
+
+.thirdPlaceLabel {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1rem;
+  letter-spacing: 0.22em;
+  color: rgba(212,245,192,0.45);
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+.thirdPlaceLabel::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 36px; height: 2px;
+  background: var(--green);
+  opacity: 0.5;
+}

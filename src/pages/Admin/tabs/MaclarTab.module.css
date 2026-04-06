@@ -223,3 +223,30 @@
 .byeBtn:hover { color: var(--green); border-color: rgba(83,252,24,0.45); background: rgba(83,252,24,0.06); }
 
 .divider { height: 1px; background: var(--border); }
+
+/* ─── 3rd place section ─── */
+.thirdPlaceSection {
+  margin-top: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.thirdPlaceLabel {
+  font-family: 'Bebas Neue', cursive;
+  font-size: 0.85rem;
+  letter-spacing: 0.22em;
+  color: rgba(212,245,192,0.45);
+  padding: 0 0 0.3rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.thirdPlaceLabel::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 0;
+  width: 32px; height: 2px;
+  background: var(--green);
+  opacity: 0.5;
+}
