@@ -152,12 +152,12 @@ export default function Home() {
         {/* ── Badge + headline ── */}
         <div className={styles.heroMeta}>
 
-          <div className={`${styles.heroBadge} fade-up`}>
+          <div className={styles.heroBadge}>
             <span className={styles.liveDot} />
             {badge}
           </div>
 
-          <div className={`${styles.heroHeadline} fade-up`}>
+          <div className={styles.heroHeadline}>
             <span className={styles.h1}>1<em>V</em>1</span>
             <span className={styles.h2}>TURNUVA</span>
           </div>
@@ -188,7 +188,7 @@ export default function Home() {
         {/* ── CTA + stats ── */}
         <div className={styles.heroActions}>
 
-          <div className={`${styles.heroCta} fade-up-1`}>
+          <div className={styles.heroCta}>
             <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
               Kick'te Takip Et
             </a>
@@ -197,7 +197,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className={`${styles.statsStrip} fade-up-2`}>
+          <div className={styles.statsStrip}>
             <div className={`${styles.statItem} ${styles.statItemFire}`} style={{ '--flame': flameIntensity, '--flame-v': flameVisual }}>
               {flameIntensity > 0 && <span className={styles.flame} aria-hidden />}
               <span className={styles.statNum}>{animCount}</span>
