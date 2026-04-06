@@ -167,6 +167,28 @@ export async function saveBracket(data) {
   return setSetting('global', 'bracket', JSON.stringify(data))
 }
 
+// ─── Visit counts ────────────────────────────────────────────────────────────
+
+export async function getVisitCounts() {
+  if (!isConfigured) return []
+  try {
+    const { data, error } = await supabase
+      .from('visits')
+      .select('date')
+      .order('date', { ascending: false })
+    logErr('getVisitCounts', error)
+    if (!data) return []
+    // Group by date in JS — never expose individual hashes
+    const map = {}
+    for (const row of data) {
+      map[row.date] = (map[row.date] || 0) + 1
+    }
+    return Object.entries(map)
+      .map(([date, count]) => ({ date, count }))
+      .sort((a, b) => b.date.localeCompare(a.date))
+  } catch (e) { logErr('getVisitCounts', e); return [] }
+}
+
 // ─── Storage ─────────────────────────────────────────────────────────────────
 
 export async function uploadImage(path, file) {

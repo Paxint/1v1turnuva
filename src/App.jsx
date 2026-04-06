@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Routes, Route, Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
@@ -21,7 +22,15 @@ function Layout() {
   )
 }
 
+const VISIT_KEY = 'paxint_visited'
+
 export default function App() {
+  useEffect(() => {
+    if (sessionStorage.getItem(VISIT_KEY)) return
+    sessionStorage.setItem(VISIT_KEY, '1')
+    fetch('/api/log-visit', { method: 'POST' }).catch(() => {})
+  }, [])
+
   return (
     <Routes>
       <Route element={<Layout />}>
