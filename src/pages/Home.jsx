@@ -149,8 +149,8 @@ export default function Home() {
 
       <div className={`${styles.heroInner} ${!hasImage ? styles.noImage : ''}`}>
 
-        {/* ── Left column ── */}
-        <div className={styles.heroLeft}>
+        {/* ── Badge + headline ── */}
+        <div className={styles.heroMeta}>
 
           <div className={`${styles.heroBadge} fade-up`}>
             <span className={styles.liveDot} />
@@ -161,6 +161,32 @@ export default function Home() {
             <span className={styles.h1}>1<em>V</em>1</span>
             <span className={styles.h2}>TURNUVA</span>
           </div>
+
+        </div>
+
+        {/* ── Right column: poster ── */}
+        {hasImage && (
+          <div className={`${styles.heroRight} fade-up-1`}>
+            <div className={styles.posterFrame}>
+              <div className={styles.posterInner}>
+                <span className={styles.cornerTL} aria-hidden />
+                <span className={styles.cornerTR} aria-hidden />
+                <span className={styles.cornerBL} aria-hidden />
+                <span className={styles.cornerBR} aria-hidden />
+                <img
+                  key={posterSrc}
+                  className={styles.poster}
+                  src={posterSrc}
+                  alt="Turnuva Posteri"
+                  onError={() => setImgError(true)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── CTA + stats ── */}
+        <div className={styles.heroActions}>
 
           <div className={`${styles.heroCta} fade-up-1`}>
             <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
@@ -222,27 +248,6 @@ export default function Home() {
           </div>
 
         </div>
-
-        {/* ── Right column: poster ── */}
-        {hasImage && (
-          <div className={`${styles.heroRight} fade-up-1`}>
-            <div className={styles.posterFrame}>
-              <div className={styles.posterInner}>
-                <span className={styles.cornerTL} aria-hidden />
-                <span className={styles.cornerTR} aria-hidden />
-                <span className={styles.cornerBL} aria-hidden />
-                <span className={styles.cornerBR} aria-hidden />
-                <img
-                  key={posterSrc}
-                  className={styles.poster}
-                  src={posterSrc}
-                  alt="Turnuva Posteri"
-                  onError={() => setImgError(true)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
       </div>
 

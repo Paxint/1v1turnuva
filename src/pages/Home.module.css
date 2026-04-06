@@ -31,8 +31,12 @@
 .heroInner {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 5rem;
+  grid-template-rows: auto 1fr;
+  grid-template-areas:
+    "meta   poster"
+    "actions poster";
+  column-gap: 5rem;
+  row-gap: 1.8rem;
   width: 100%;
   max-width: 1400px;
   margin: 0 auto;
@@ -42,14 +46,25 @@
 
 .heroInner.noImage {
   grid-template-columns: 1fr;
+  grid-template-areas:
+    "meta"
+    "actions";
   max-width: 640px;
 }
 
-/* ─── Left column ─── */
-.heroLeft {
+.heroMeta {
+  grid-area: meta;
   display: flex;
   flex-direction: column;
   gap: 1.8rem;
+}
+
+.heroActions {
+  grid-area: actions;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  align-self: end;
 }
 
 /* ─── Badge ─── */
@@ -267,6 +282,7 @@
 
 /* ─── Right column ─── */
 .heroRight {
+  grid-area: poster;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -455,17 +471,14 @@
     align-items: flex-start;
   }
   .heroInner {
-    grid-template-columns: 1fr;
-    gap: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.8rem;
   }
-  .heroRight {
-    height: auto;
-    justify-content: center;
-    order: -1;
-  }
-  .poster {
-    max-height: 55vw;
-  }
+  .heroMeta    { order: 1; }
+  .heroRight   { order: 2; height: auto; justify-content: center; }
+  .heroActions { order: 3; }
+  .poster { max-height: 55vw; }
 }
 
 @media (max-width: 600px) {
