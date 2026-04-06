@@ -5,6 +5,8 @@ import {
   deleteRegistration,
   clearRegistrations,
   saveBracket,
+  getSetting,
+  setSetting,
 } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
@@ -47,22 +49,34 @@ export default function KayitlarTab() {
   const [exportText, setExportText] = useState('')
   const [copySuc, setCopySuc] = useState(false)
   const [bracketMsg, setBracketMsg] = useState('')
+  const [regMode, setRegMode] = useState('kick_lol') // 'kick_lol' | 'kick_only'
 
   async function load() {
     const rows = await getRegistrations()
     setList(rows)
   }
 
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    getSetting('global', 'reg_mode').then(v => { if (v) setRegMode(v) })
+  }, [])
+
+  async function handleModeChange(mode) {
+    setRegMode(mode)
+    await setSetting('global', 'reg_mode', mode)
+  }
 
   async function handleAdd() {
     setAddErr(''); setAddSuc('')
-    if (!addKick.trim() || !addLol.trim()) {
+    const kick = addKick.trim()
+    const lol  = addLol.trim()
+    if (!kick) { setAddErr('❌ Kick nick zorunludur.'); setTimeout(() => setAddErr(''), 3000); return }
+    if (regMode === 'kick_lol' && !lol) {
       setAddErr('❌ Her iki alan da dolu olmalı.')
       setTimeout(() => setAddErr(''), 3000)
       return
     }
-    const { error } = await addRegistration(addKick.trim(), addLol.trim())
+    const { error } = await addRegistration(kick, regMode === 'kick_only' ? '' : lol)
     if (error) {
       setAddErr('❌ Ekleme hatası.')
       setTimeout(() => setAddErr(''), 3000)
@@ -89,7 +103,7 @@ export default function KayitlarTab() {
   async function handleCreateBracket() {
     if (list.length < 2) { setBracketMsg('❌ En az 2 katılımcı gerekli.'); setTimeout(() => setBracketMsg(''), 3000); return }
     if (!window.confirm(`${list.length} oyuncuyla bracket oluşturulsun mu?`)) return
-    const bracket = buildBracket(list.map(r => r.lol_nick))
+    const bracket = buildBracket(list.map(r => regMode === 'kick_only' ? r.kick_nick : r.lol_nick))
     await saveBracket(bracket)
     setBracketMsg('✅ Bracket oluşturuldu!')
     setTimeout(() => setBracketMsg(''), 3000)
@@ -125,11 +139,32 @@ export default function KayitlarTab() {
         <div className={styles.cardTitle}>➕ Manuel Kayıt Ekle</div>
         <div className={styles.kayitAdd}>
           <input className="ipt" type="text" placeholder="Kick nick" value={addKick} onChange={e => setAddKick(e.target.value)} />
-          <input className="ipt" type="text" placeholder="LoL nick"  value={addLol}  onChange={e => setAddLol(e.target.value)} />
+          {regMode === 'kick_lol' && (
+            <input className="ipt" type="text" placeholder="LoL nick" value={addLol} onChange={e => setAddLol(e.target.value)} />
+          )}
           <button className={styles.addBtn} onClick={handleAdd}>Ekle</button>
         </div>
         {addSuc && <div className={styles.sucMsg}>{addSuc}</div>}
         {addErr && <div className={styles.errMsg}>{addErr}</div>}
+      </div>
+
+      {/* Mode Toggle */}
+      <div className={styles.modeToggleWrap}>
+        <span className={styles.modeToggleLabel}>Kayıt Formu Modu</span>
+        <div className={styles.modeToggle}>
+          <button
+            className={`${styles.modeBtn} ${regMode === 'kick_lol' ? styles.modeBtnActive : ''}`}
+            onClick={() => handleModeChange('kick_lol')}
+          >
+            Kick + LoL
+          </button>
+          <button
+            className={`${styles.modeBtn} ${regMode === 'kick_only' ? styles.modeBtnActive : ''}`}
+            onClick={() => handleModeChange('kick_only')}
+          >
+            Sadece Kick
+          </button>
+        </div>
       </div>
 
       {/* List */}
@@ -139,8 +174,8 @@ export default function KayitlarTab() {
 
         <div className={styles.exportRow}>
           <button className={styles.expBtn} onClick={() => exportList('kick')}>📋 Kick</button>
-          <button className={styles.expBtn} onClick={() => exportList('lol')}>📋 LoL</button>
-          <button className={styles.expBtn} onClick={() => exportList('both')}>📋 İkisi</button>
+          {regMode === 'kick_lol' && <button className={styles.expBtn} onClick={() => exportList('lol')}>📋 LoL</button>}
+          {regMode === 'kick_lol' && <button className={styles.expBtn} onClick={() => exportList('both')}>📋 İkisi</button>}
           <button className={`${styles.expBtn} ${styles.expBtnDanger}`} onClick={handleClearAll}>🗑️ Tümünü Sil</button>
         </div>
 
@@ -150,7 +185,7 @@ export default function KayitlarTab() {
             : list.map(r => (
               <div key={r.id} className={styles.kayitRow}>
                 <span className={styles.kickNick}>{r.kick_nick}</span>
-                <span className={styles.lolNick}>{r.lol_nick}</span>
+                {regMode === 'kick_lol' && r.lol_nick && <span className={styles.lolNick}>{r.lol_nick}</span>}
                 <button className={styles.delBtn} onClick={() => handleDelete(r.id)}>✕ Sil</button>
               </div>
             ))

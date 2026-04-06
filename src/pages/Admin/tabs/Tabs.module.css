@@ -495,3 +495,47 @@
 }
 .delBtn:hover { background: rgba(255, 68, 68, 0.22); }
 
+/* ─── Kayıt Modu Toggle ─── */
+.modeToggleWrap {
+  margin-bottom: 1.2rem;
+}
+
+.modeToggleLabel {
+  display: block;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(212,245,192,0.35);
+  margin-bottom: 0.5rem;
+}
+
+.modeToggle {
+  display: flex;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.modeBtn {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  background: transparent;
+  color: rgba(212,245,192,0.4);
+  border: none;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.modeBtn + .modeBtn { border-left: 1px solid var(--border); }
+.modeBtnActive {
+  background: rgba(83,252,24,0.12);
+  color: var(--green);
+}
+.modeBtn:not(.modeBtnActive):hover { background: rgba(83,252,24,0.05); color: rgba(212,245,192,0.6); }
+

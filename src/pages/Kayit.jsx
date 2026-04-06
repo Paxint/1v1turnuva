@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { addRegistration, getRegistrations } from '../lib/supabase'
+import { useState, useEffect } from 'react'
+import { addRegistration, getRegistrations, getSetting } from '../lib/supabase'
 import styles from './Kayit.module.css'
 
 export default function Kayit() {
@@ -9,8 +9,14 @@ export default function Kayit() {
   const [lolErr, setLolErr] = useState('')
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [regMode, setRegMode] = useState(null) // null = loading
 
-  const canSubmit = kickNick.trim() && lolNick.trim()
+  useEffect(() => {
+    getSetting('global', 'reg_mode').then(v => setRegMode(v || 'kick_lol'))
+  }, [])
+
+  const kickOnly = regMode === 'kick_only'
+  const canSubmit = kickNick.trim() && (kickOnly || lolNick.trim())
 
   async function handleSubmit(e) {
     e.preventDefault()
@@ -18,29 +24,30 @@ export default function Kayit() {
     setLolErr('')
 
     const kick = kickNick.trim()
-    const lol = lolNick.trim()
+    const lol  = lolNick.trim()
 
     if (!kick) { setKickErr('Bu alan zorunludur.'); return }
-    if (!lol)  { setLolErr('Bu alan zorunludur.'); return }
 
-    // LoL nick format: OyuncuAdı#TAG
-    const lolParts = lol.split('#')
-    if (lolParts.length !== 2 || !lolParts[0].trim() || !lolParts[1].trim()) {
-      setLolErr('❌ Geçersiz format. Örnek: OyuncuAdı#TR1'); return
-    }
+    if (!kickOnly) {
+      if (!lol) { setLolErr('Bu alan zorunludur.'); return }
 
-    // Riot API ile hesap doğrulama
-    try {
-      const res = await fetch(
-        `/api/riot-check?name=${encodeURIComponent(lolParts[0].trim())}&tag=${encodeURIComponent(lolParts[1].trim())}`
-      )
-      const data = await res.json()
-      if (res.ok && data.exists === false) {
-        setLolErr('❌ Bu Riot hesabı bulunamadı. Nick#TAG formatını kontrol et.')
-        setLoading(false); return
+      // LoL nick format: OyuncuAdı#TAG
+      const lolParts = lol.split('#')
+      if (lolParts.length !== 2 || !lolParts[0].trim() || !lolParts[1].trim()) {
+        setLolErr('❌ Geçersiz format. Örnek: OyuncuAdı#TR1'); return
       }
-    } catch {
-      // API erişilemezse format kontrolüyle devam et
+
+      // Riot API ile hesap doğrulama
+      try {
+        const res = await fetch(
+          `/api/riot-check?name=${encodeURIComponent(lolParts[0].trim())}&tag=${encodeURIComponent(lolParts[1].trim())}`
+        )
+        const data = await res.json()
+        if (res.ok && data.exists === false) {
+          setLolErr('❌ Bu Riot hesabı bulunamadı. Nick#TAG formatını kontrol et.')
+          return
+        }
+      } catch { /* format kontrolüyle devam et */ }
     }
 
     setLoading(true)
@@ -48,18 +55,17 @@ export default function Kayit() {
     // Duplicate check
     const existing = await getRegistrations()
     const dupKick = existing.some(r => r.kick_nick.toLowerCase() === kick.toLowerCase())
-    const dupLol  = existing.some(r => r.lol_nick.toLowerCase()  === lol.toLowerCase())
-
     if (dupKick) { setKickErr('❌ Bu Kick nick zaten kayıtlı.'); setLoading(false); return }
-    if (dupLol)  { setLolErr('❌ Bu LoL nick zaten kayıtlı.');  setLoading(false); return }
 
-    const { error } = await addRegistration(kick, lol)
+    if (!kickOnly) {
+      const dupLol = existing.some(r => r.lol_nick && r.lol_nick.toLowerCase() === lol.toLowerCase())
+      if (dupLol) { setLolErr('❌ Bu LoL nick zaten kayıtlı.'); setLoading(false); return }
+    }
+
+    const { error } = await addRegistration(kick, kickOnly ? '' : lol)
     setLoading(false)
 
-    if (error) {
-      setKickErr('❌ Kayıt sırasında hata oluştu. Tekrar dene.')
-      return
-    }
+    if (error) { setKickErr('❌ Kayıt sırasında hata oluştu. Tekrar dene.'); return }
 
     setKickNick('')
     setLolNick('')
@@ -75,39 +81,43 @@ export default function Kayit() {
       </div>
 
       <div className={`${styles.formCard} fade-up-1`}>
-        <form onSubmit={handleSubmit}>
-          <div className={styles.field}>
-            <label>Kick Nick</label>
-            <input
-              className="ipt"
-              type="text"
-              placeholder="Kick kullanıcı adın"
-              value={kickNick}
-              onChange={e => setKickNick(e.target.value)}
-            />
-            {kickErr && <div className={styles.err}>{kickErr}</div>}
-          </div>
+        {regMode === null ? null : (
+          <form onSubmit={handleSubmit}>
+            <div className={styles.field}>
+              <label>Kick Nick</label>
+              <input
+                className="ipt"
+                type="text"
+                placeholder="Kick kullanıcı adın"
+                value={kickNick}
+                onChange={e => setKickNick(e.target.value)}
+              />
+              {kickErr && <div className={styles.err}>{kickErr}</div>}
+            </div>
 
-          <div className={styles.field}>
-            <label>League of Legends Nick</label>
-            <input
-              className="ipt"
-              type="text"
-              placeholder="OyuncuAdı#TR1"
-              value={lolNick}
-              onChange={e => setLolNick(e.target.value)}
-            />
-            {lolErr && <div className={styles.err}>{lolErr}</div>}
-          </div>
+            {!kickOnly && (
+              <div className={styles.field}>
+                <label>League of Legends Nick</label>
+                <input
+                  className="ipt"
+                  type="text"
+                  placeholder="OyuncuAdı#TR1"
+                  value={lolNick}
+                  onChange={e => setLolNick(e.target.value)}
+                />
+                {lolErr && <div className={styles.err}>{lolErr}</div>}
+              </div>
+            )}
 
-          <button
-            className={styles.submitBtn}
-            type="submit"
-            disabled={!canSubmit || loading}
-          >
-            {loading ? 'Kaydediliyor...' : 'Kaydı Tamamla'}
-          </button>
-        </form>
+            <button
+              className={styles.submitBtn}
+              type="submit"
+              disabled={!canSubmit || loading}
+            >
+              {loading ? 'Kaydediliyor...' : 'Kaydı Tamamla'}
+            </button>
+          </form>
+        )}
 
         {success && (
           <div className={styles.successBox}>
