@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
-import { getSetting, getRegistrations, getBracket, subscribeToTable } from '../lib/supabase'
+import { getSetting, getRegistrations, getBracket, getBroadcasters, subscribeToTable } from '../lib/supabase'
 import styles from './Home.module.css'
 
 function useCountUp(target, duration = 1400) {
@@ -49,6 +49,16 @@ function useCountdown(target) {
   }
 }
 
+function extractKickUsername(url) {
+  if (!url) return null
+  try {
+    const u = new URL(url)
+    if (!u.hostname.includes('kick.com')) return null
+    const parts = u.pathname.split('/').filter(Boolean)
+    return parts[0] || null
+  } catch { return null }
+}
+
 function CountdownUnit({ value, label }) {
   return (
     <div className={styles.cdUnit}>
@@ -93,6 +103,32 @@ export default function Home() {
     const unsub2 = subscribeToTable('registrations', load)
     return () => { unsub1(); unsub2() }
   }, [load, ready])
+
+  const [liveBroadcasters, setLiveBroadcasters] = useState([])
+
+  useEffect(() => {
+    async function checkLive() {
+      const rows = await getBroadcasters()
+      const candidates = rows
+        .map(b => ({ name: b.name, username: extractKickUsername(b.link_url), link_url: b.link_url }))
+        .filter(b => b.username)
+      if (candidates.length === 0) return
+      const live = []
+      await Promise.all(candidates.map(async (b) => {
+        try {
+          const r = await fetch(
+            `https://kick.com/api/v2/channels/${encodeURIComponent(b.username)}`,
+            { headers: { 'Accept': 'application/json' } }
+          )
+          if (!r.ok) return
+          const data = await r.json()
+          if (data?.livestream) live.push(b)
+        } catch { /* ignore */ }
+      }))
+      setLiveBroadcasters(live)
+    }
+    checkLive()
+  }, [])
 
   const animCount = useCountUp(regCount)
   const countdown = useCountdown(countdownTarget)
@@ -209,6 +245,30 @@ export default function Home() {
         )}
 
       </div>
+
+      {/* Live broadcaster popups */}
+      {liveBroadcasters.length > 0 && (
+        <div className={styles.livePopups}>
+          {liveBroadcasters.map((b, i) => (
+            <a
+              key={i}
+              href={b.link_url}
+              target="_blank"
+              rel="noreferrer"
+              className={styles.livePopup}
+              style={{ animationDelay: `${i * 0.12}s` }}
+            >
+              <span className={styles.livePopupDot} />
+              <div className={styles.livePopupContent}>
+                <span className={styles.livePopupLabel}>Şu an yayında</span>
+                <span className={styles.livePopupName}>{b.name}</span>
+              </div>
+              <span className={styles.livePopupArrow}>→</span>
+            </a>
+          ))}
+        </div>
+      )}
+
     </section>
   )
 }
