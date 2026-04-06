@@ -81,8 +81,8 @@ export default function Yayincilar() {
   return (
     <div className={styles.page}>
       <div className={`${styles.pageHeader} fade-up`}>
-        <span className={styles.pageTag}>Turnuva Kadrosu</span>
-        <h1>Turnuva <span>Yayıncıları</span></h1>
+        <span className={styles.pageTag}>Yayıncı Kadrosu</span>
+        <h1><span>Yayıncılar</span></h1>
       </div>
 
       <div className={`${styles.cards} fade-up-1`}>
