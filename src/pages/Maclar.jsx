@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { getBracket, subscribeToTable } from '../lib/supabase'
 import styles from './Maclar.module.css'
 
@@ -38,6 +38,38 @@ function MatchCard({ match }) {
 export default function Maclar() {
   const [bracket, setBracket] = useState(null)
   const [loading, setLoading] = useState(true)
+  const scrollRef = useRef(null)
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (!el) return
+    let isDown = false, startX, startY, scrollLeft, scrollTop
+    const onDown = (e) => {
+      isDown = true
+      el.classList.add(styles.dragging)
+      startX = e.pageX - el.offsetLeft
+      startY = e.pageY - el.offsetTop
+      scrollLeft = el.scrollLeft
+      scrollTop = el.scrollTop
+    }
+    const onUp = () => { isDown = false; el.classList.remove(styles.dragging) }
+    const onMove = (e) => {
+      if (!isDown) return
+      e.preventDefault()
+      el.scrollLeft = scrollLeft - (e.pageX - el.offsetLeft - startX)
+      el.scrollTop  = scrollTop  - (e.pageY - el.offsetTop  - startY)
+    }
+    el.addEventListener('mousedown', onDown)
+    el.addEventListener('mouseup', onUp)
+    el.addEventListener('mouseleave', onUp)
+    el.addEventListener('mousemove', onMove)
+    return () => {
+      el.removeEventListener('mousedown', onDown)
+      el.removeEventListener('mouseup', onUp)
+      el.removeEventListener('mouseleave', onUp)
+      el.removeEventListener('mousemove', onMove)
+    }
+  }, [])
 
   const load = useCallback(async () => {
     const data = await getBracket()
@@ -75,7 +107,7 @@ export default function Maclar() {
               🏆 Şampiyon: <strong>{champion}</strong>
             </div>
           )}
-          <div className={styles.bracketScroll}>
+          <div className={styles.bracketScroll} ref={scrollRef}>
             <div className={styles.bracket}>
               {bracket.rounds.map((round, rIdx) => (
                 <div className={styles.round} key={rIdx}>

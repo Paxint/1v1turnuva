@@ -82,12 +82,25 @@
 
 /* ─── Bracket scroll wrapper ─── */
 .bracketScroll {
-  overflow-x: auto;
+  overflow: auto;
   padding-bottom: 1.5rem;
+  cursor: grab;
+  user-select: none;
+  -webkit-overflow-scrolling: touch;
+  touch-action: pan-x pan-y;
 }
-.bracketScroll::-webkit-scrollbar { height: 4px; }
+.bracketScroll.dragging {
+  cursor: grabbing;
+}
+.bracketScroll::-webkit-scrollbar { height: 4px; width: 4px; }
 .bracketScroll::-webkit-scrollbar-track { background: rgba(83,252,24,0.04); }
 .bracketScroll::-webkit-scrollbar-thumb { background: rgba(83,252,24,0.2); border-radius: 2px; }
+
+@media (max-width: 768px) {
+  .bracketScroll {
+    max-height: calc(100vh - 220px);
+  }
+}
 
 /* ─── Bracket layout ─── */
 .bracket {
