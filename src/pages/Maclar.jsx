@@ -141,7 +141,7 @@ export default function Maclar() {
           <div className={styles.bracketScroll} ref={scrollRef}>
             <div className={styles.bracket} ref={bracketRef}>
               {bracket.rounds.map((round, rIdx) => (
-                <div className={styles.round} key={rIdx}>
+                <div className={styles.round} key={rIdx} style={{ animationDelay: `${rIdx * 0.1}s` }}>
                   <div className={styles.roundLabel}>
                     {roundName(rIdx, bracket.rounds.length)}
                   </div>
