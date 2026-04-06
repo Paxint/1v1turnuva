@@ -39,7 +39,38 @@ export default function Maclar() {
   const [bracket, setBracket] = useState(null)
   const [loading, setLoading] = useState(true)
   const scrollRef = useRef(null)
+  const bracketRef = useRef(null)
 
+  // Pinch zoom
+  useEffect(() => {
+    const el = scrollRef.current
+    const inner = bracketRef.current
+    if (!el || !inner) return
+    let scale = 1, initDist = 0, initScale = 1
+
+    function dist(t) {
+      const dx = t[0].clientX - t[1].clientX
+      const dy = t[0].clientY - t[1].clientY
+      return Math.sqrt(dx * dx + dy * dy)
+    }
+    const onStart = (e) => {
+      if (e.touches.length === 2) { initDist = dist(e.touches); initScale = scale }
+    }
+    const onMove = (e) => {
+      if (e.touches.length !== 2) return
+      e.preventDefault()
+      scale = Math.min(1, Math.max(0.25, initScale * (dist(e.touches) / initDist)))
+      inner.style.transform = `scale(${scale})`
+    }
+    el.addEventListener('touchstart', onStart, { passive: true })
+    el.addEventListener('touchmove', onMove, { passive: false })
+    return () => {
+      el.removeEventListener('touchstart', onStart)
+      el.removeEventListener('touchmove', onMove)
+    }
+  }, [])
+
+  // Mouse drag scroll
   useEffect(() => {
     const el = scrollRef.current
     if (!el) return
@@ -108,7 +139,7 @@ export default function Maclar() {
             </div>
           )}
           <div className={styles.bracketScroll} ref={scrollRef}>
-            <div className={styles.bracket}>
+            <div className={styles.bracket} ref={bracketRef}>
               {bracket.rounds.map((round, rIdx) => (
                 <div className={styles.round} key={rIdx}>
                   <div className={styles.roundLabel}>
