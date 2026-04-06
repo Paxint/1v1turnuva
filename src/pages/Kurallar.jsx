@@ -32,12 +32,11 @@ function RuleSection({ rule, index, defaultOpen }) {
 
 export default function Kurallar() {
   const { theme } = useTheme()
-  const [rules, setRules] = useState(DEFAULT_RULES)
+  const [rules, setRules] = useState(null)
 
   const load = useCallback(async () => {
     const rows = await getRules(theme)
-    if (rows.length > 0) setRules(rows)
-    else setRules(DEFAULT_RULES)
+    setRules(rows.length > 0 ? rows : DEFAULT_RULES)
   }, [theme])
 
   useEffect(() => {
@@ -57,9 +56,12 @@ export default function Kurallar() {
       </div>
 
       <div className={styles.rulesContainer}>
-        {rules.map((rule, i) => (
-          <RuleSection key={i} rule={rule} index={i} defaultOpen={i === 0} />
-        ))}
+        {rules === null
+          ? null
+          : rules.map((rule, i) => (
+              <RuleSection key={i} rule={rule} index={i} defaultOpen={i === 0} />
+            ))
+        }
       </div>
 
       <div className={`${styles.highlightBox} fade-up-3`}>
