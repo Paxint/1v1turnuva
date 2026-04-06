@@ -38,13 +38,23 @@ export default function Yayincilar() {
       .map(b => ({ username: extractKickUsername(b.link_url) }))
       .filter(({ username }) => username)
     if (entries.length === 0) return
-    try {
-      const usernames = entries.map(e => e.username).join(',')
-      const r = await fetch(`/api/kick-live?usernames=${encodeURIComponent(usernames)}`)
-      if (!r.ok) return
-      const data = await r.json()
-      setLiveStatus(data)
-    } catch { }
+    const statuses = {}
+    await Promise.all(
+      entries.map(async ({ username }) => {
+        try {
+          const r = await fetch(
+            `https://kick.com/api/v2/channels/${encodeURIComponent(username)}`,
+            { headers: { 'Accept': 'application/json' } }
+          )
+          if (!r.ok) { statuses[username] = false; return }
+          const data = await r.json()
+          statuses[username] = !!data?.livestream
+        } catch {
+          statuses[username] = false
+        }
+      })
+    )
+    setLiveStatus(statuses)
   }, [])
 
   useEffect(() => {

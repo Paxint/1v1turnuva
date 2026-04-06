@@ -113,13 +113,19 @@ export default function Home() {
         .map(b => ({ name: b.name, username: extractKickUsername(b.link_url), link_url: b.link_url }))
         .filter(b => b.username)
       if (candidates.length === 0) return
-      try {
-        const usernames = candidates.map(b => b.username).join(',')
-        const r = await fetch(`/api/kick-live?usernames=${encodeURIComponent(usernames)}`)
-        if (!r.ok) return
-        const results = await r.json()
-        setLiveBroadcasters(candidates.filter(b => results[b.username]))
-      } catch { }
+      const live = []
+      await Promise.all(candidates.map(async (b) => {
+        try {
+          const r = await fetch(
+            `https://kick.com/api/v2/channels/${encodeURIComponent(b.username)}`,
+            { headers: { 'Accept': 'application/json' } }
+          )
+          if (!r.ok) return
+          const data = await r.json()
+          if (data?.livestream) live.push(b)
+        } catch { }
+      }))
+      setLiveBroadcasters(live)
     }
     checkLive()
   }, [])
