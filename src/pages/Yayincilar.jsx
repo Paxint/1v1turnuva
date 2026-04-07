@@ -4,6 +4,28 @@ import { extractKickUsername } from '../lib/kickUtils'
 import HoverEffect from '../components/HoverEffect'
 import styles from './Yayincilar.module.css'
 
+const EFFECT_COLORS = {
+  fire:      { color: '#ff5000', glow: 'rgba(255,80,0,0.45)',      border: 'rgba(255,80,0,0.3)'     },
+  ice:       { color: '#00b4ff', glow: 'rgba(0,180,255,0.45)',     border: 'rgba(0,180,255,0.28)'   },
+  lightning: { color: '#ffdc00', glow: 'rgba(255,220,0,0.45)',     border: 'rgba(255,220,0,0.28)'   },
+  poison:    { color: '#cc00ff', glow: 'rgba(200,0,255,0.45)',     border: 'rgba(200,0,255,0.28)'   },
+  dark:      { color: '#a050dd', glow: 'rgba(140,60,210,0.45)',    border: 'rgba(140,60,210,0.25)'  },
+  blood:     { color: '#dd0000', glow: 'rgba(210,0,0,0.45)',       border: 'rgba(210,0,0,0.28)'     },
+  water:     { color: '#0088ff', glow: 'rgba(0,136,255,0.45)',     border: 'rgba(0,136,255,0.28)'   },
+  grass:     { color: '#00dd44', glow: 'rgba(0,210,68,0.45)',      border: 'rgba(0,210,68,0.28)'    },
+  fighting:  { color: '#ff4400', glow: 'rgba(255,68,0,0.45)',      border: 'rgba(255,68,0,0.28)'    },
+  ground:    { color: '#cc8800', glow: 'rgba(200,130,0,0.45)',     border: 'rgba(200,130,0,0.28)'   },
+  flying:    { color: '#88ccff', glow: 'rgba(136,204,255,0.4)',    border: 'rgba(136,204,255,0.22)' },
+  psychic:   { color: '#ff0088', glow: 'rgba(255,0,136,0.45)',     border: 'rgba(255,0,136,0.28)'   },
+  bug:       { color: '#88dd00', glow: 'rgba(136,221,0,0.45)',     border: 'rgba(136,221,0,0.28)'   },
+  rock:      { color: '#bb9944', glow: 'rgba(187,153,68,0.45)',    border: 'rgba(187,153,68,0.28)'  },
+  ghost:     { color: '#9900cc', glow: 'rgba(153,0,204,0.45)',     border: 'rgba(153,0,204,0.28)'   },
+  dragon:    { color: '#5500ff', glow: 'rgba(85,0,255,0.45)',      border: 'rgba(85,0,255,0.28)'    },
+  steel:     { color: '#aabbcc', glow: 'rgba(170,187,204,0.4)',    border: 'rgba(170,187,204,0.22)' },
+  fairy:     { color: '#ff66cc', glow: 'rgba(255,102,204,0.45)',   border: 'rgba(255,102,204,0.28)' },
+  normal:    { color: '#bbaa88', glow: 'rgba(187,170,136,0.35)',   border: 'rgba(187,170,136,0.2)'  },
+}
+
 const DEFAULT_BROADCASTERS = [
   { name: 'Paxint',    subtitle: 'Yayıncı', image_url: '', sort_order: 0, effect: 'none' },
   { name: 'Rakuexe27', subtitle: 'Yayıncı', image_url: '', sort_order: 1, effect: 'none' },
@@ -103,10 +125,17 @@ export default function Yayincilar() {
             </>
           )
           const cardClass = `${styles.card} ${isLive ? styles.cardLive : ''}`
+          const ec = b.effect && b.effect !== 'none' ? EFFECT_COLORS[b.effect] : null
+          const effectStyle = ec ? {
+            '--effect-color':  ec.color,
+            '--effect-glow':   ec.glow,
+            '--effect-border': ec.border,
+          } : {}
           return b.link_url ? (
             <a
               key={b.name}
               className={cardClass}
+              style={effectStyle}
               href={b.link_url}
               target="_blank"
               rel="noreferrer"
@@ -118,6 +147,7 @@ export default function Yayincilar() {
             <div
               key={b.name}
               className={cardClass}
+              style={effectStyle}
               onMouseEnter={() => handleEnter(b.effect)}
               onMouseLeave={handleLeave}
               onMouseMove={handleCardMouseMove}

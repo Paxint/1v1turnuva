@@ -58,7 +58,7 @@
   text-decoration: none;
   color: inherit;
   background: var(--card);
-  border: 1px solid var(--border);
+  border: 1px solid var(--effect-border, var(--border));
   border-radius: 6px;
   overflow: hidden;
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1),
@@ -69,13 +69,29 @@
   will-change: transform;
 }
 
+/* Ambient aura — her zaman görünür, çok ince */
+.card::before {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: 7px;
+  box-shadow: 0 0 14px var(--effect-glow, transparent);
+  opacity: 0.35;
+  pointer-events: none;
+  z-index: -1;
+  transition: opacity 0.35s ease, box-shadow 0.35s ease;
+}
+.card:hover::before {
+  opacity: 1;
+  box-shadow: 0 0 28px var(--effect-glow, transparent);
+}
+
 /* Spotlight overlay */
 .card::after {
   content: '';
   position: absolute; inset: 0;
   background: radial-gradient(
     circle 120px at var(--sx, 50%) var(--sy, 50%),
-    rgba(83,252,24,0.13) 0%,
+    var(--effect-glow, rgba(83,252,24,0.13)) 0%,
     transparent 70%
   );
   opacity: 0;
@@ -90,9 +106,9 @@
   transform: scale(1.08) translateY(-8px) translateZ(0);
   box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.6),
-    0 0 40px var(--green-glow),
-    0 0 80px var(--green-glow);
-  border-color: var(--green);
+    0 0 40px var(--effect-glow, var(--green-glow)),
+    0 0 80px var(--effect-glow, var(--green-glow));
+  border-color: var(--effect-color, var(--green));
   z-index: 61;
 }
 
@@ -183,7 +199,8 @@
   font-family: 'Bebas Neue', cursive;
   font-size: 1.6rem;
   letter-spacing: 0.08em;
-  color: var(--green);
+  color: var(--effect-color, var(--green));
+  text-shadow: 0 0 16px var(--effect-glow, var(--green-glow));
   margin-bottom: 0.2rem;
 }
 
