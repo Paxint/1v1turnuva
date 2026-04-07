@@ -157,6 +157,32 @@ export default function Home() {
   const flameVisual = flameIntensity > 0 ? Math.pow(flameIntensity, 0.4) : 0
 
   const hasImage = posterSrc && !imgError
+  const posterRef = useRef(null)
+  const holoRef   = useRef(null)
+
+  function handlePosterMove(e) {
+    const wrap = e.currentTarget
+    const rect = wrap.getBoundingClientRect()
+    const x = (e.clientX - rect.left) / rect.width
+    const y = (e.clientY - rect.top)  / rect.height
+    wrap.style.transition = 'transform 0.1s ease'
+    wrap.style.setProperty('--rx', `${(y - 0.5) * -18}deg`)
+    wrap.style.setProperty('--ry', `${(x - 0.5) *  18}deg`)
+    wrap.style.setProperty('--px', `${x * 100}%`)
+    wrap.style.setProperty('--py', `${y * 100}%`)
+    if (holoRef.current) {
+      holoRef.current.style.backgroundPosition = `0% 0%, ${x * 100}% ${y * 100}%`
+      holoRef.current.style.opacity = '1'
+    }
+  }
+
+  function handlePosterLeave(e) {
+    const wrap = e.currentTarget
+    wrap.style.transition = 'transform 0.7s cubic-bezier(0.34, 1.56, 0.64, 1)'
+    wrap.style.setProperty('--rx', '0deg')
+    wrap.style.setProperty('--ry', '0deg')
+    if (holoRef.current) holoRef.current.style.opacity = '0'
+  }
 
   return (
     <section className={styles.hero}>
@@ -183,19 +209,27 @@ export default function Home() {
         {/* ── Right column: poster ── */}
         {hasImage && (
           <div className={styles.heroRight}>
-            <div className={styles.posterFrame}>
-              <div className={styles.posterInner}>
-                <span className={styles.cornerTL} aria-hidden />
-                <span className={styles.cornerTR} aria-hidden />
-                <span className={styles.cornerBL} aria-hidden />
-                <span className={styles.cornerBR} aria-hidden />
-                <img
-                  key={posterSrc}
-                  className={styles.poster}
-                  src={posterSrc}
-                  alt="Turnuva Posteri"
-                  onError={() => setImgError(true)}
-                />
+            <div
+              ref={posterRef}
+              className={styles.posterTiltWrap}
+              onMouseMove={handlePosterMove}
+              onMouseLeave={handlePosterLeave}
+            >
+              <div className={styles.posterFrame}>
+                <div className={styles.posterInner}>
+                  <span className={styles.cornerTL} aria-hidden />
+                  <span className={styles.cornerTR} aria-hidden />
+                  <span className={styles.cornerBL} aria-hidden />
+                  <span className={styles.cornerBR} aria-hidden />
+                  <img
+                    key={posterSrc}
+                    className={styles.poster}
+                    src={posterSrc}
+                    alt="Turnuva Posteri"
+                    onError={() => setImgError(true)}
+                  />
+                  <div ref={holoRef} className={styles.posterHolo} aria-hidden />
+                </div>
               </div>
             </div>
           </div>

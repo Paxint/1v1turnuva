@@ -396,31 +396,43 @@
   pointer-events: none; z-index: -2;
 }
 
+.posterTiltWrap {
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  will-change: transform;
+}
+
 .posterInner {
   position: relative; border-radius: 5px; overflow: hidden;
   background: var(--black);
 }
 
-.posterInner::after {
-  content: '';
-  position: absolute;
-  top: -80%; left: -60%;
-  width: 40%; height: 260%;
-  background: linear-gradient(
-    105deg,
-    transparent 35%,
-    rgba(255,255,255,0.13) 50%,
-    transparent 65%
-  );
-  transform: translateX(-100%) translateY(-100%);
-  animation: poster-scan 4s ease-in-out infinite;
+/* Holographic foil overlay */
+.posterHolo {
+  position: absolute; inset: 0;
+  z-index: 3;
   pointer-events: none;
-}
-
-@keyframes poster-scan {
-  0%   { transform: translateX(-100%) translateY(-100%); }
-  40%  { transform: translateX(380%)  translateY(180%); }
-  100% { transform: translateX(380%)  translateY(180%); }
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.55s ease;
+  background:
+    radial-gradient(
+      circle at var(--px, 50%) var(--py, 50%),
+      rgba(255,255,255,0.3) 0%,
+      rgba(255,255,255,0.04) 40%,
+      transparent 62%
+    ),
+    linear-gradient(
+      115deg,
+      rgba(255,0,100,0.22)   0%,
+      rgba(255,200,0,0.22)  18%,
+      rgba(0,255,120,0.22)  36%,
+      rgba(0,180,255,0.22)  54%,
+      rgba(180,0,255,0.22)  72%,
+      rgba(255,0,100,0.22)  90%
+    );
+  background-size: 100% 100%, 400% 400%;
+  background-position: 0% 0%, 0% 0%;
+  mix-blend-mode: color-dodge;
 }
 
 .poster {
