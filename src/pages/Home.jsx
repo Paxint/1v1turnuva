@@ -2,7 +2,30 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { useTheme } from '../context/ThemeContext'
 import { getSetting, getRegistrations, getBracket, getBroadcasters, subscribeToTable } from '../lib/supabase'
+import { extractKickUsername } from '../lib/kickUtils'
 import styles from './Home.module.css'
+
+function MagneticWrap({ children }) {
+  const ref = useRef(null)
+  function onMouseMove(e) {
+    const el = ref.current
+    const rect = el.getBoundingClientRect()
+    const dx = e.clientX - (rect.left + rect.width / 2)
+    const dy = e.clientY - (rect.top + rect.height / 2)
+    el.style.transition = 'transform 0.1s ease'
+    el.style.transform = `translate(${dx * 0.35}px, ${dy * 0.35}px)`
+  }
+  function onMouseLeave() {
+    const el = ref.current
+    el.style.transition = 'transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
+    el.style.transform = ''
+  }
+  return (
+    <div ref={ref} onMouseMove={onMouseMove} onMouseLeave={onMouseLeave} style={{ display: 'inline-block' }}>
+      {children}
+    </div>
+  )
+}
 
 function useCountUp(target, duration = 1400) {
   const [count, setCount] = useState(0)
@@ -49,15 +72,6 @@ function useCountdown(target) {
   }
 }
 
-function extractKickUsername(url) {
-  if (!url) return null
-  try {
-    const u = new URL(url)
-    if (!u.hostname.includes('kick.com')) return null
-    const parts = u.pathname.split('/').filter(Boolean)
-    return parts[0] || null
-  } catch { return null }
-}
 
 function CountdownUnit({ value, label }) {
   return (
@@ -112,7 +126,7 @@ export default function Home() {
       const candidates = rows
         .map(b => ({ name: b.name, username: extractKickUsername(b.link_url), link_url: b.link_url }))
         .filter(b => b.username)
-      if (candidates.length === 0) return
+      if (candidates.length === 0) { setLiveBroadcasters([]); return }
       const live = []
       await Promise.all(candidates.map(async (b) => {
         try {
@@ -128,6 +142,8 @@ export default function Home() {
       setLiveBroadcasters(live)
     }
     checkLive()
+    const interval = setInterval(checkLive, 2 * 60 * 1000)
+    return () => clearInterval(interval)
   }, [])
 
   const animCount = useCountUp(regCount)
@@ -189,12 +205,16 @@ export default function Home() {
         <div className={styles.heroActions}>
 
           <div className={styles.heroCta}>
-            <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
-              Kick'te Takip Et
-            </a>
-            <Link className="btn btn-outline" to="/kayit">
-              Turnuvaya Katıl
-            </Link>
+            <MagneticWrap>
+              <a className="btn btn-primary" href={followUrl} target="_blank" rel="noreferrer">
+                Kick'te Takip Et
+              </a>
+            </MagneticWrap>
+            <MagneticWrap>
+              <Link className="btn btn-outline" to="/kayit">
+                Turnuvaya Katıl
+              </Link>
+            </MagneticWrap>
           </div>
 
           <div className={styles.statsStrip}>

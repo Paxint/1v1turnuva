@@ -1,5 +1,6 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { getBroadcasters, subscribeToTable } from '../lib/supabase'
+import { extractKickUsername } from '../lib/kickUtils'
 import HoverEffect from '../components/HoverEffect'
 import styles from './Yayincilar.module.css'
 
@@ -9,29 +10,12 @@ const DEFAULT_BROADCASTERS = [
   { name: 'Redjangu',  subtitle: 'Yayıncı', image_url: '', sort_order: 2, effect: 'none' },
 ]
 
-function extractKickUsername(url) {
-  if (!url) return null
-  try {
-    const u = new URL(url)
-    if (!u.hostname.includes('kick.com')) return null
-    const parts = u.pathname.split('/').filter(Boolean)
-    return parts[0] || null
-  } catch {
-    return null
-  }
-}
-
 export default function Yayincilar() {
   const [broadcasters, setBroadcasters] = useState(DEFAULT_BROADCASTERS)
   const [liveStatus, setLiveStatus] = useState({})
   const [hoveredEffect, setHoveredEffect] = useState('none')
   const [isHovering, setIsHovering] = useState(false)
-
-  const load = useCallback(async () => {
-    const rows = await getBroadcasters()
-    if (rows.length > 0) setBroadcasters(rows)
-    else setBroadcasters(DEFAULT_BROADCASTERS)
-  }, [])
+  const broadcastersRef = useRef(DEFAULT_BROADCASTERS)
 
   const checkLive = useCallback(async (list) => {
     const entries = list
@@ -57,15 +41,26 @@ export default function Yayincilar() {
     setLiveStatus(statuses)
   }, [])
 
+  const load = useCallback(async () => {
+    const rows = await getBroadcasters()
+    const list = rows.length > 0 ? rows : DEFAULT_BROADCASTERS
+    broadcastersRef.current = list
+    setBroadcasters(list)
+    checkLive(list)
+  }, [checkLive])
+
   useEffect(() => {
     load()
     const unsub = subscribeToTable('broadcasters', load)
-    return unsub
-  }, [load])
+    const interval = setInterval(() => checkLive(broadcastersRef.current), 2 * 60 * 1000)
+    return () => { unsub(); clearInterval(interval) }
+  }, [load, checkLive])
 
-  useEffect(() => {
-    checkLive(broadcasters)
-  }, [broadcasters, checkLive])
+  function handleCardMouseMove(e) {
+    const rect = e.currentTarget.getBoundingClientRect()
+    e.currentTarget.style.setProperty('--sx', `${e.clientX - rect.left}px`)
+    e.currentTarget.style.setProperty('--sy', `${e.clientY - rect.top}px`)
+  }
 
   function handleEnter(effect) {
     setHoveredEffect(effect || 'none')
@@ -107,22 +102,25 @@ export default function Yayincilar() {
               </div>
             </>
           )
+          const cardClass = `${styles.card} ${isLive ? styles.cardLive : ''}`
           return b.link_url ? (
             <a
-              key={i}
-              className={styles.card}
+              key={b.name}
+              className={cardClass}
               href={b.link_url}
               target="_blank"
               rel="noreferrer"
               onMouseEnter={() => handleEnter(b.effect)}
               onMouseLeave={handleLeave}
+              onMouseMove={handleCardMouseMove}
             >{inner}</a>
           ) : (
             <div
-              key={i}
-              className={styles.card}
+              key={b.name}
+              className={cardClass}
               onMouseEnter={() => handleEnter(b.effect)}
               onMouseLeave={handleLeave}
+              onMouseMove={handleCardMouseMove}
             >{inner}</div>
           )
         })}

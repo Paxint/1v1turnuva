@@ -15,6 +15,7 @@ const Admin     = lazy(() => import('./pages/Admin'))
 function Layout() {
   return (
     <>
+      <div className="grain" aria-hidden />
       <CursorGlow />
       <Navbar />
       <Outlet />

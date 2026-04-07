@@ -1,3 +1,17 @@
+/* ─── Keyframes (self-contained — don't rely on global index.css) ─── */
+@keyframes live-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.4; transform: scale(0.7); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-8px); }
+}
+
 /* ─── Hero wrapper ─── */
 .hero {
   position: relative;
@@ -160,6 +174,16 @@
   line-height: 1;
 }
 
+@keyframes chromaGlitch {
+  0%, 87%, 100% { text-shadow: none; }
+  88%   { text-shadow: -4px 0 rgba(255,0,60,0.9),  4px 0 rgba(0,240,255,0.9); }
+  89%   { text-shadow:  4px 0 rgba(255,0,60,0.9), -4px 0 rgba(0,240,255,0.9); }
+  89.5% { text-shadow: none; }
+  90%   { text-shadow: -6px 0 rgba(255,0,60,0.85), 6px 0 rgba(0,240,255,0.85); }
+  90.5% { text-shadow: none; }
+  91%   { text-shadow:  2px 0 rgba(255,0,60,0.7), -2px 0 rgba(0,240,255,0.7); }
+}
+
 .h1 {
   font-family: 'Bebas Neue', cursive;
   font-size: clamp(4rem, 7vw, 7.5rem);
@@ -167,6 +191,7 @@
   color: var(--text);
   line-height: 0.88;
   display: block;
+  animation: chromaGlitch 9s ease-in-out infinite;
 }
 
 .h1 em {
@@ -468,7 +493,6 @@
 }
 
 .livePopup:hover {
-  border-left-color: var(--green);
   box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 28px rgba(83,252,24,0.14);
   transform: translateX(-3px);
 }
