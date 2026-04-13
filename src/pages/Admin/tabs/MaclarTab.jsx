@@ -58,7 +58,7 @@ function clearWinner(rounds, rIdx, mIdx) {
   }
 }
 
-function MatchCard({ match, onSelect, onClear }) {
+function MatchCard({ match, onSelect, onClear, swapSelected, swapTarget, onSwapClick }) {
   const [copied, setCopied] = useState(null)
   const isBye = match.p1 && !match.p2
   const hasWinner = !!match.winner
@@ -74,8 +74,20 @@ function MatchCard({ match, onSelect, onClear }) {
     setTimeout(() => setCopied(null), 1200)
   }
 
+  const matchClass = [
+    styles.match,
+    hasWinner ? styles.decided : '',
+    swapSelected ? styles.swapSelected : '',
+    swapTarget ? styles.swapTarget : '',
+  ].filter(Boolean).join(' ')
+
   return (
-    <div className={`${styles.match} ${hasWinner ? styles.decided : ''}`}>
+    <div className={matchClass}>
+      <button
+        className={styles.swapBtn}
+        onClick={onSwapClick}
+        title={swapSelected ? 'Seçimi iptal et' : swapTarget ? 'Bu maçla yer değiştir' : 'Yer değiştir'}
+      >⇄</button>
       {/* Player 1 */}
       <div className={`${styles.player} ${p1win ? styles.won : ''} ${hasWinner && !p1win ? styles.lost : ''} ${!match.p1 ? styles.bye : ''}`}>
         <span
@@ -122,6 +134,7 @@ export default function MaclarTab() {
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState('')
   const [zoom, setZoom] = useState(1)
+  const [swapSel, setSwapSel] = useState(null)
   const scrollRef = useRef(null)
   const labelsRef = useRef(null)
 
@@ -246,6 +259,41 @@ export default function MaclarTab() {
     setTimeout(() => setMsg(''), 2000)
   }
 
+  function handleSwapClick(rIdx, mIdx) {
+    if (!swapSel) {
+      setSwapSel({ rIdx, mIdx })
+      return
+    }
+    // Aynı maça tekrar tıklandı → iptal
+    if (swapSel.rIdx === rIdx && swapSel.mIdx === mIdx) {
+      setSwapSel(null)
+      return
+    }
+    // Farklı tur → seçimi değiştir
+    if (swapSel.rIdx !== rIdx) {
+      setSwapSel({ rIdx, mIdx })
+      return
+    }
+    // Aynı tur, farklı maç → yer değiştir
+    const next = JSON.parse(JSON.stringify(bracket))
+    const a = next.rounds[rIdx][swapSel.mIdx]
+    const b = next.rounds[rIdx][mIdx]
+    if (a.winner) clearWinner(next.rounds, rIdx, swapSel.mIdx)
+    if (b.winner) clearWinner(next.rounds, rIdx, mIdx)
+    const { p1: ap1, p2: ap2 } = next.rounds[rIdx][swapSel.mIdx]
+    next.rounds[rIdx][swapSel.mIdx].p1 = next.rounds[rIdx][mIdx].p1
+    next.rounds[rIdx][swapSel.mIdx].p2 = next.rounds[rIdx][mIdx].p2
+    next.rounds[rIdx][mIdx].p1 = ap1
+    next.rounds[rIdx][mIdx].p2 = ap2
+    next.rounds[rIdx][swapSel.mIdx].winner = null
+    next.rounds[rIdx][mIdx].winner = null
+    setBracket(next)
+    saveBracket(next)
+    setSwapSel(null)
+    setMsg('✅ Maçlar yer değiştirdi')
+    setTimeout(() => setMsg(''), 2000)
+  }
+
   const champion = bracket?.rounds?.at(-1)?.[0]?.winner
 
   return (
@@ -293,6 +341,9 @@ export default function MaclarTab() {
                           match={match}
                           onSelect={(w) => handleSelect(rIdx, mIdx, w)}
                           onClear={() => handleClear(rIdx, mIdx)}
+                          swapSelected={!!(swapSel && swapSel.rIdx === rIdx && swapSel.mIdx === mIdx)}
+                          swapTarget={!!(swapSel && swapSel.rIdx === rIdx && swapSel.mIdx !== mIdx)}
+                          onSwapClick={() => handleSwapClick(rIdx, mIdx)}
                         />
                       </div>
                     ))}
