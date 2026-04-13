@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { getBracket, saveBracket, subscribeToTable } from '../../../lib/supabase'
 import styles from './MaclarTab.module.css'
 import tabStyles from './Tabs.module.css'
@@ -101,10 +101,21 @@ export default function MaclarTab() {
   const [loading, setLoading] = useState(true)
   const [msg, setMsg] = useState('')
   const [zoom, setZoom] = useState(1)
+  const scrollRef = useRef(null)
+  const labelsRef = useRef(null)
 
   function zoomIn()    { setZoom(z => Math.min(1.5, +(z + 0.1).toFixed(1))) }
   function zoomOut()   { setZoom(z => Math.max(0.5, +(z - 0.1).toFixed(1))) }
   function zoomReset() { setZoom(1) }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    const labels = labelsRef.current
+    if (!el || !labels) return
+    const sync = () => { labels.scrollLeft = el.scrollLeft }
+    el.addEventListener('scroll', sync)
+    return () => el.removeEventListener('scroll', sync)
+  }, [])
 
   const load = useCallback(async () => {
     const data = await getBracket()
@@ -233,13 +244,23 @@ export default function MaclarTab() {
             <button className={styles.zoomBtn} onClick={zoomIn} title="Büyüt">+</button>
           </div>
 
-          <div className={styles.bracketScroll}>
+          <div className={styles.roundLabelsBar} ref={labelsRef}>
+            <div className={styles.roundLabelsInner} style={{ zoom }}>
+              {bracket.rounds.map((_, rIdx) => (
+                <div
+                  key={rIdx}
+                  className={`${styles.roundLabelCell} ${rIdx === bracket.rounds.length - 1 ? styles.roundLabelCellFinal : ''}`}
+                >
+                  {roundName(rIdx, bracket.rounds.length)}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.bracketScroll} ref={scrollRef}>
             <div className={styles.bracket} style={{ zoom }}>
               {bracket.rounds.map((round, rIdx) => (
                 <div className={styles.round} key={rIdx}>
-                  <div className={styles.roundLabel}>
-                    {roundName(rIdx, bracket.rounds.length)}
-                  </div>
                   <div className={styles.matchList}>
                     {round.map((match, mIdx) => (
                       <div
