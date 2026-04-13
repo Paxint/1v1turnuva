@@ -40,6 +40,7 @@ export default function Maclar() {
   const [loading, setLoading] = useState(true)
   const scrollRef = useRef(null)
   const bracketRef = useRef(null)
+  const labelsRef = useRef(null)
 
   // Pinch zoom
   useEffect(() => {
@@ -102,6 +103,16 @@ export default function Maclar() {
     }
   }, [])
 
+  // Sync sticky labels bar horizontal scroll with bracket scroll
+  useEffect(() => {
+    const el = scrollRef.current
+    const labels = labelsRef.current
+    if (!el || !labels) return
+    const sync = () => { labels.scrollLeft = el.scrollLeft }
+    el.addEventListener('scroll', sync)
+    return () => el.removeEventListener('scroll', sync)
+  }, [])
+
   const load = useCallback(async () => {
     const data = await getBracket()
     setBracket(data)
@@ -138,14 +149,23 @@ export default function Maclar() {
               🏆 Şampiyon: <strong>{champion}</strong>
             </div>
           )}
-          <div className={styles.bracketScroll} ref={scrollRef}>
+          <div className={styles.roundLabelsBar} ref={labelsRef}>
+            <div className={styles.roundLabelsInner}>
+              {bracket.rounds.map((_, rIdx) => (
+                <div
+                  key={rIdx}
+                  className={`${styles.roundLabelCell} ${rIdx === bracket.rounds.length - 1 ? styles.roundLabelCellFinal : ''}`}
+                >
+                  {roundName(rIdx, bracket.rounds.length)}
+                </div>
+              ))}
+            </div>
+          </div>
 
+          <div className={styles.bracketScroll} ref={scrollRef}>
             <div className={styles.bracket} ref={bracketRef}>
               {bracket.rounds.map((round, rIdx) => (
                 <div className={styles.round} key={rIdx} style={{ animationDelay: `${rIdx * 0.1}s` }}>
-                  <div className={styles.roundLabel}>
-                    {roundName(rIdx, bracket.rounds.length)}
-                  </div>
                   <div className={styles.matchList}>
                     {round.map((match, mIdx) => (
                       <div

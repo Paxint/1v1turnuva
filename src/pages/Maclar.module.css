@@ -80,6 +80,64 @@
 .emptyIcon { font-size: 3.5rem; margin-bottom: 1rem; }
 .empty small { display: block; margin-top: 0.5rem; font-size: 0.85rem; opacity: 0.6; }
 
+/* ─── Sticky round labels bar ─── */
+.roundLabelsBar {
+  position: sticky;
+  top: 64px;
+  z-index: 20;
+  overflow: hidden;
+  background: var(--black);
+  margin-bottom: -1px;
+}
+
+.roundLabelsInner {
+  display: flex;
+  gap: 0;
+  width: max-content;
+  min-width: 100%;
+}
+
+.roundLabelCell {
+  min-width: 220px;
+  flex: 1;
+  font-family: 'Bebas Neue', cursive;
+  font-size: 1rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(212,245,192,0.45);
+  text-align: center;
+  padding: 0.6rem 0 1.2rem;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+}
+.roundLabelCell::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 24px; height: 2px;
+  background: var(--green);
+  opacity: 0.25;
+}
+.roundLabelCell::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 40px; height: 2px;
+  background: var(--green);
+  opacity: 0.45;
+}
+
+.roundLabelCellFinal {
+  color: var(--green);
+  font-size: 1.1rem;
+  letter-spacing: 0.22em;
+  text-shadow: 0 0 18px rgba(83,252,24,0.35);
+}
+.roundLabelCellFinal::before { opacity: 0.7; width: 40px; }
+.roundLabelCellFinal::after  { width: 80px; opacity: 1; }
+
 /* ─── Bracket scroll wrapper ─── */
 .bracketScroll {
   overflow: auto;
@@ -169,6 +227,7 @@
   display: flex;
   flex-direction: column;
   flex: 1;
+  padding-top: 1.2rem;
 }
 
 /* Gap between every match */
