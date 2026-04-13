@@ -163,31 +163,33 @@ export default function Maclar() {
           </div>
 
           <div className={styles.bracketScroll} ref={scrollRef}>
-            <div className={styles.bracket} ref={bracketRef}>
-              {bracket.rounds.map((round, rIdx) => (
-                <div className={styles.round} key={rIdx} style={{ animationDelay: `${rIdx * 0.1}s` }}>
-                  <div className={styles.matchList}>
-                    {round.map((match, mIdx) => (
-                      <div
-                        key={match.id}
-                        className={styles.matchSlot}
-                        style={{ flex: Math.pow(2, rIdx) }}
-                      >
-                        <MatchCard match={match} />
-                      </div>
-                    ))}
+            <div className={styles.bracketWrapper}>
+              <div className={styles.bracket} ref={bracketRef}>
+                {bracket.rounds.map((round, rIdx) => (
+                  <div className={styles.round} key={rIdx} style={{ animationDelay: `${rIdx * 0.1}s` }}>
+                    <div className={styles.matchList}>
+                      {round.map((match, mIdx) => (
+                        <div
+                          key={match.id}
+                          className={styles.matchSlot}
+                          style={{ flex: Math.pow(2, rIdx) }}
+                        >
+                          <MatchCard match={match} />
+                        </div>
+                      ))}
+                    </div>
                   </div>
+                ))}
+              </div>
+
+              {bracket.thirdPlace && (
+                <div className={`${styles.thirdPlaceSection} fade-up`}>
+                  <div className={styles.thirdPlaceLabel}>3. Yer Maçı</div>
+                  <MatchCard match={bracket.thirdPlace} />
                 </div>
-              ))}
+              )}
             </div>
           </div>
-
-          {bracket.thirdPlace && (
-            <div className={`${styles.thirdPlaceSection} fade-up`}>
-              <div className={styles.thirdPlaceLabel}>3. Yer Maçı</div>
-              <MatchCard match={bracket.thirdPlace} />
-            </div>
-          )}
         </>
       )}
     </div>
