@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { getBracket, saveBracket, subscribeToTable } from '../../../lib/supabase'
+import { getBracket, saveBracket, subscribeToTable, getRegistrations } from '../../../lib/supabase'
 import styles from './MaclarTab.module.css'
 import tabStyles from './Tabs.module.css'
 
@@ -58,7 +58,7 @@ function clearWinner(rounds, rIdx, mIdx) {
   }
 }
 
-function MatchCard({ match, onSelect, onClear, swapSelected, swapTarget, onSwapClick }) {
+function MatchCard({ match, onSelect, onClear, swapSelected, swapTarget, onSwapClick, kickMap = {} }) {
   const [copied, setCopied] = useState(null)
   const isBye = match.p1 && !match.p2
   const hasWinner = !!match.winner
@@ -90,12 +90,19 @@ function MatchCard({ match, onSelect, onClear, swapSelected, swapTarget, onSwapC
       >⇄</button>
       {/* Player 1 */}
       <div className={`${styles.player} ${p1win ? styles.won : ''} ${hasWinner && !p1win ? styles.lost : ''} ${!match.p1 ? styles.bye : ''}`}>
-        <span
-          className={`${styles.pName} ${match.p1 ? styles.copyable : ''}`}
-          onClick={() => copy(match.p1, 'p1')}
-          title={match.p1 ? 'Kopyala' : ''}
-        >
-          {copied === 'p1' ? '✓' : (match.p1 || 'TBD')}
+        <span className={styles.pNameWrap}>
+          <span
+            className={`${styles.pName} ${match.p1 ? styles.copyable : ''}`}
+            onClick={() => copy(match.p1, 'p1')}
+          >
+            {copied === 'p1' ? '✓' : (match.p1 || 'TBD')}
+          </span>
+          {match.p1 && kickMap[match.p1] && (
+            <span className={styles.kickTooltip}>
+              <span className={styles.kickTooltipLabel}>kick</span>
+              {kickMap[match.p1]}
+            </span>
+          )}
         </span>
         <div className={styles.actionCell}>
           {p1win
@@ -109,12 +116,19 @@ function MatchCard({ match, onSelect, onClear, swapSelected, swapTarget, onSwapC
 
       {/* Player 2 */}
       <div className={`${styles.player} ${p2win ? styles.won : ''} ${hasWinner && !p2win ? styles.lost : ''} ${isBye || !match.p2 ? styles.bye : ''}`}>
-        <span
-          className={`${styles.pName} ${match.p2 && !isBye ? styles.copyable : ''}`}
-          onClick={() => copy(!isBye ? match.p2 : null, 'p2')}
-          title={match.p2 && !isBye ? 'Kopyala' : ''}
-        >
-          {copied === 'p2' ? '✓' : (isBye ? 'BYE' : (match.p2 || 'TBD'))}
+        <span className={styles.pNameWrap}>
+          <span
+            className={`${styles.pName} ${match.p2 && !isBye ? styles.copyable : ''}`}
+            onClick={() => copy(!isBye ? match.p2 : null, 'p2')}
+          >
+            {copied === 'p2' ? '✓' : (isBye ? 'BYE' : (match.p2 || 'TBD'))}
+          </span>
+          {match.p2 && !isBye && kickMap[match.p2] && (
+            <span className={styles.kickTooltip}>
+              <span className={styles.kickTooltipLabel}>kick</span>
+              {kickMap[match.p2]}
+            </span>
+          )}
         </span>
         <div className={styles.actionCell}>
           {p2win
@@ -135,6 +149,7 @@ export default function MaclarTab() {
   const [msg, setMsg] = useState('')
   const [zoom, setZoom] = useState(1)
   const [swapSel, setSwapSel] = useState(null)
+  const [kickMap, setKickMap] = useState({})
   const scrollRef = useRef(null)
   const labelsRef = useRef(null)
 
@@ -152,8 +167,11 @@ export default function MaclarTab() {
   }, [])
 
   const load = useCallback(async () => {
-    const data = await getBracket()
+    const [data, regs] = await Promise.all([getBracket(), getRegistrations()])
     setBracket(data)
+    const map = {}
+    regs.forEach(r => { if (r.lol_nick) map[r.lol_nick] = r.kick_nick })
+    setKickMap(map)
     setLoading(false)
   }, [])
 
@@ -344,6 +362,7 @@ export default function MaclarTab() {
                           swapSelected={!!(swapSel && swapSel.rIdx === rIdx && swapSel.mIdx === mIdx)}
                           swapTarget={!!(swapSel && swapSel.rIdx === rIdx && swapSel.mIdx !== mIdx)}
                           onSwapClick={() => handleSwapClick(rIdx, mIdx)}
+                          kickMap={kickMap}
                         />
                       </div>
                     ))}
