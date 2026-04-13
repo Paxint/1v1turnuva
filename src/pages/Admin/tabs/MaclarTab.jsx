@@ -59,38 +59,59 @@ function clearWinner(rounds, rIdx, mIdx) {
 }
 
 function MatchCard({ match, onSelect, onClear }) {
+  const [copied, setCopied] = useState(null)
   const isBye = match.p1 && !match.p2
   const hasWinner = !!match.winner
   const p1win = !!match.winner && match.winner === match.p1
   const p2win = !!match.winner && match.winner === match.p2
-  const p1clickable = !!match.p1 && (!hasWinner || p2win)
-  const p2clickable = (!!match.p2 || isBye) && (!hasWinner || p1win)
+  const p1canAdvance = !!match.p1 && (!hasWinner || p2win)
+  const p2canAdvance = !!match.p2 && !isBye && (!hasWinner || p1win)
+
+  function copy(name, slot) {
+    if (!name) return
+    navigator.clipboard?.writeText(name)
+    setCopied(slot)
+    setTimeout(() => setCopied(null), 1200)
+  }
 
   return (
     <div className={`${styles.match} ${hasWinner ? styles.decided : ''}`}>
-      <div
-        className={`${styles.player} ${p1win ? styles.won : ''} ${p1clickable ? styles.clickable : ''} ${hasWinner && !p1win ? styles.lost : ''} ${!match.p1 ? styles.bye : ''}`}
-        onClick={() => p1clickable && onSelect(match.p1)}
-      >
-        <span className={styles.pName}>{match.p1 || 'TBD'}</span>
-        {p1win
-          ? <span className={styles.winMark} title="Kazananı kaldır" onClick={e => { e.stopPropagation(); onClear() }}>✓ ✕</span>
-          : p1clickable && <span className={styles.winBtn}>▲</span>
-        }
+      {/* Player 1 */}
+      <div className={`${styles.player} ${p1win ? styles.won : ''} ${hasWinner && !p1win ? styles.lost : ''} ${!match.p1 ? styles.bye : ''}`}>
+        <span
+          className={`${styles.pName} ${match.p1 ? styles.copyable : ''}`}
+          onClick={() => copy(match.p1, 'p1')}
+          title={match.p1 ? 'Kopyala' : ''}
+        >
+          {copied === 'p1' ? '✓' : (match.p1 || 'TBD')}
+        </span>
+        <div className={styles.actionCell}>
+          {p1win
+            ? <span className={styles.winMark} title="Kazananı kaldır" onClick={onClear}>✕</span>
+            : p1canAdvance && <button className={styles.advanceBtn} onClick={() => onSelect(match.p1)} title="Kazanan">▶</button>
+          }
+        </div>
       </div>
+
       <div className={styles.divider} />
-      <div
-        className={`${styles.player} ${p2win ? styles.won : ''} ${p2clickable && !isBye ? styles.clickable : ''} ${hasWinner && !p2win ? styles.lost : ''} ${isBye || !match.p2 ? styles.bye : ''}`}
-        onClick={() => !isBye && p2clickable && onSelect(match.p2)}
-      >
-        <span className={styles.pName}>{isBye ? 'BYE' : (match.p2 || 'TBD')}</span>
-        {p2win
-          ? <span className={styles.winMark} title="Kazananı kaldır" onClick={e => { e.stopPropagation(); onClear() }}>✓ ✕</span>
-          : (!isBye && p2clickable) && <span className={styles.winBtn}>▲</span>
-        }
-        {isBye && !hasWinner && match.p1 &&
-          <span className={styles.byeBtn} onClick={e => { e.stopPropagation(); onSelect(match.p1) }}>BYE →</span>
-        }
+
+      {/* Player 2 */}
+      <div className={`${styles.player} ${p2win ? styles.won : ''} ${hasWinner && !p2win ? styles.lost : ''} ${isBye || !match.p2 ? styles.bye : ''}`}>
+        <span
+          className={`${styles.pName} ${match.p2 && !isBye ? styles.copyable : ''}`}
+          onClick={() => copy(!isBye ? match.p2 : null, 'p2')}
+          title={match.p2 && !isBye ? 'Kopyala' : ''}
+        >
+          {copied === 'p2' ? '✓' : (isBye ? 'BYE' : (match.p2 || 'TBD'))}
+        </span>
+        <div className={styles.actionCell}>
+          {p2win
+            ? <span className={styles.winMark} title="Kazananı kaldır" onClick={onClear}>✕</span>
+            : isBye && !hasWinner && match.p1
+              ? <button className={styles.advanceBtn} onClick={() => onSelect(match.p1)} title="BYE — ilerlet">→</button>
+              : p2canAdvance && <button className={styles.advanceBtn} onClick={() => onSelect(match.p2)} title="Kazanan">▶</button>
+          }
+        </div>
       </div>
     </div>
   )

@@ -216,14 +216,12 @@
 
 .player {
   display: flex; align-items: center;
-  padding: 0.5rem 0.65rem; gap: 0.4rem;
+  padding: 0.5rem 0 0.5rem 0.65rem; gap: 0.4rem;
   min-height: 36px;
   transition: background 0.15s;
   cursor: default;
   position: relative;
 }
-.clickable { cursor: pointer; }
-.clickable:hover { background: rgba(83,252,24,0.07); }
 
 .pName {
   flex: 1;
@@ -233,16 +231,41 @@
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   max-width: 110px;
 }
+.copyable {
+  cursor: copy;
+  transition: color 0.12s;
+}
+.copyable:hover { color: var(--green); }
+
+.actionCell {
+  flex-shrink: 0;
+  width: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.advanceBtn {
+  width: 24px; height: 24px;
+  background: rgba(83,252,24,0.08);
+  border: 1px solid rgba(83,252,24,0.25);
+  border-radius: 2px;
+  color: rgba(83,252,24,0.6);
+  font-size: 0.7rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+.advanceBtn:hover {
+  background: rgba(83,252,24,0.2);
+  color: var(--green);
+  border-color: rgba(83,252,24,0.6);
+}
 .won { background: rgba(83,252,24,0.06); }
 .won .pName { color: var(--green); text-shadow: 0 0 10px rgba(83,252,24,0.4); }
 .lost .pName { opacity: 0.28; }
 .bye .pName { opacity: 0.3; font-style: italic; }
-
-.winBtn {
-  font-size: 0.58rem; color: rgba(83,252,24,0.4); flex-shrink: 0;
-  transition: color 0.15s;
-}
-.clickable:hover .winBtn { color: var(--green); }
 
 .winMark {
   font-size: 0.65rem; color: var(--green); flex-shrink: 0;
