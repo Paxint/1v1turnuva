@@ -167,6 +167,73 @@ export async function saveBracket(data) {
   return setSetting('global', 'bracket', JSON.stringify(data))
 }
 
+// ─── Admin Users ─────────────────────────────────────────────────────────────
+
+async function hashPassword(password) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(password))
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+export async function getAdminUserByCredentials(username, password) {
+  if (!isConfigured) return null
+  try {
+    const hash = await hashPassword(password)
+    const { data, error } = await supabase
+      .from('admin_users')
+      .select('id, username, role')
+      .eq('username', username)
+      .eq('password_hash', hash)
+      .maybeSingle()
+    logErr('getAdminUserByCredentials', error)
+    return data ?? null
+  } catch (e) { logErr('getAdminUserByCredentials', e); return null }
+}
+
+export async function getAdminUsers() {
+  if (!isConfigured) return []
+  try {
+    const { data, error } = await supabase
+      .from('admin_users')
+      .select('id, username, role, created_at')
+      .order('created_at', { ascending: true })
+    logErr('getAdminUsers', error)
+    return data ?? []
+  } catch (e) { logErr('getAdminUsers', e); return [] }
+}
+
+export async function createAdminUser(username, password, role) {
+  if (!isConfigured) return { data: null, error: new Error('Supabase not configured') }
+  try {
+    const password_hash = await hashPassword(password)
+    const { data, error } = await supabase
+      .from('admin_users')
+      .insert({ username, password_hash, role })
+      .select()
+      .single()
+    logErr('createAdminUser', error)
+    return { data, error }
+  } catch (e) { logErr('createAdminUser', e); return { data: null, error: e } }
+}
+
+export async function updateAdminUserPassword(id, newPassword) {
+  if (!isConfigured) return new Error('Supabase not configured')
+  try {
+    const password_hash = await hashPassword(newPassword)
+    const { error } = await supabase
+      .from('admin_users')
+      .update({ password_hash })
+      .eq('id', id)
+    logErr('updateAdminUserPassword', error)
+    return error
+  } catch (e) { logErr('updateAdminUserPassword', e); return e }
+}
+
+export async function deleteAdminUser(id) {
+  if (!isConfigured) return
+  const { error } = await supabase.from('admin_users').delete().eq('id', id)
+  logErr('deleteAdminUser', error)
+}
+
 // ─── Visit counts ────────────────────────────────────────────────────────────
 
 export async function getVisitCounts() {

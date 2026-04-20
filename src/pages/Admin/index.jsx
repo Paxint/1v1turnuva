@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
+import { getAdminUserByCredentials } from '../../lib/supabase'
 import LoginScreen from './LoginScreen'
 import GenelTab from './tabs/GenelTab'
 import PosterlerTab from './tabs/PosterlerTab'
@@ -10,33 +11,57 @@ import MaclarTab from './tabs/MaclarTab'
 import ApiKeyTab from './tabs/ApiKeyTab'
 import CarkTab from './tabs/CarkTab'
 import LogTab from './tabs/LogTab'
+import KullanicilarTab from './tabs/KullanicilarTab'
 import styles from './Admin.module.css'
 
 const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Paxint2026'
 const SESSION_KEY = 'paxint_admin_session'
 
+const ALL  = ['superadmin', 'yayinci', 'moderator']
+const SA_Y = ['superadmin', 'yayinci']
+const SA   = ['superadmin']
+
 const TABS = [
-  { id: 'genel',      label: '🎨 Genel' },
-  { id: 'posterler',  label: '🖼️ Posterler' },
-  { id: 'yayincilar', label: '🎮 Yayıncılar' },
-  { id: 'kurallar',   label: '📋 Kurallar' },
-  { id: 'kayitlar',   label: '📝 Kayıtlar' },
-  { id: 'maclar',     label: '🏆 Maçlar' },
-  { id: 'apikey',     label: '🔑 API Key' },
-  { id: 'cark',       label: '🎡 Çark' },
-  { id: 'log',        label: '📊 Log' },
+  { id: 'genel',        label: '🎨 Genel',       roles: ALL  },
+  { id: 'posterler',    label: '🖼️ Posterler',   roles: SA_Y },
+  { id: 'yayincilar',   label: '🎮 Yayıncılar',  roles: SA_Y },
+  { id: 'kurallar',     label: '📋 Kurallar',     roles: ALL  },
+  { id: 'kayitlar',     label: '📝 Kayıtlar',     roles: SA_Y },
+  { id: 'maclar',       label: '🏆 Maçlar',       roles: ALL  },
+  { id: 'apikey',       label: '🔑 API Key',      roles: SA   },
+  { id: 'cark',         label: '🎡 Çark',         roles: ALL  },
+  { id: 'log',          label: '📊 Log',          roles: ALL  },
+  { id: 'kullanicilar', label: '👥 Kullanıcılar', roles: SA   },
 ]
+
+function getSession() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)) } catch { return null }
+}
 
 export default function Admin() {
   const { theme, setTheme } = useTheme()
-  const [loggedIn, setLoggedIn] = useState(
-    () => sessionStorage.getItem(SESSION_KEY) === '1'
-  )
+  const [loggedIn, setLoggedIn] = useState(() => !!getSession()?.role)
+  const [role, setRole]         = useState(() => getSession()?.role ?? null)
+  const [username, setUsername] = useState(() => getSession()?.username ?? '')
   const [activeTab, setActiveTab] = useState('genel')
 
-  function handleLogin(password) {
-    if (password === ADMIN_PASSWORD) {
-      sessionStorage.setItem(SESSION_KEY, '1')
+  async function handleLogin(uname, password) {
+    // Supabase'deki kullanıcıları dene
+    const user = await getAdminUserByCredentials(uname, password)
+    if (user) {
+      const session = { role: user.role, username: user.username }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
+      setRole(user.role)
+      setUsername(user.username)
+      setLoggedIn(true)
+      return true
+    }
+    // Eski env-var superadmin fallback
+    if (uname === 'admin' && password === ADMIN_PASSWORD) {
+      const session = { role: 'superadmin', username: 'admin' }
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
+      setRole('superadmin')
+      setUsername('admin')
       setLoggedIn(true)
       return true
     }
@@ -46,24 +71,37 @@ export default function Admin() {
   function handleLogout() {
     sessionStorage.removeItem(SESSION_KEY)
     setLoggedIn(false)
+    setRole(null)
   }
 
   if (!loggedIn) return <LoginScreen onLogin={handleLogin} />
+
+  const visibleTabs = TABS.filter(t => t.roles.includes(role))
+
+  // Aktif tab görünür değilse ilk görünür tab'a geç
+  const activeVisible = visibleTabs.find(t => t.id === activeTab)
+    ? activeTab
+    : visibleTabs[0]?.id
 
   return (
     <div className={styles.body}>
       <div className={styles.panel}>
         <div className={styles.adminTop}>
           <h1>⚙️ Admin Panel</h1>
-          <a href="/" className={styles.backLink}>← Anasayfaya Dön</a>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <span style={{ fontSize: '0.78rem', color: 'rgba(212,245,192,0.4)', fontFamily: "'Barlow Condensed', sans-serif", letterSpacing: '0.06em' }}>
+              {username} · {role === 'superadmin' ? 'Süper Admin' : role === 'yayinci' ? 'Yayıncı' : 'Moderatör'}
+            </span>
+            <a href="/" className={styles.backLink}>← Anasayfaya Dön</a>
+          </div>
         </div>
 
         {/* Tab Bar */}
         <div className={styles.tabBar}>
-          {TABS.map(t => (
+          {visibleTabs.map(t => (
             <button
               key={t.id}
-              className={`${styles.tab} ${activeTab === t.id ? styles.tabActive : ''}`}
+              className={`${styles.tab} ${activeVisible === t.id ? styles.tabActive : ''}`}
               onClick={() => setActiveTab(t.id)}
             >
               {t.label}
@@ -72,15 +110,16 @@ export default function Admin() {
         </div>
 
         {/* Tab Content */}
-        {activeTab === 'genel'      && <GenelTab theme={theme} setTheme={setTheme} />}
-        {activeTab === 'posterler'  && <PosterlerTab theme={theme} />}
-        {activeTab === 'yayincilar' && <YayincilarTab />}
-        {activeTab === 'kurallar'   && <KurallarTab theme={theme} />}
-        {activeTab === 'kayitlar'   && <KayitlarTab />}
-        {activeTab === 'maclar'     && <MaclarTab />}
-        {activeTab === 'apikey'     && <ApiKeyTab />}
-        {activeTab === 'cark'       && <CarkTab />}
-        {activeTab === 'log'        && <LogTab />}
+        {activeVisible === 'genel'        && <GenelTab theme={theme} setTheme={setTheme} />}
+        {activeVisible === 'posterler'    && <PosterlerTab theme={theme} />}
+        {activeVisible === 'yayincilar'   && <YayincilarTab />}
+        {activeVisible === 'kurallar'     && <KurallarTab theme={theme} />}
+        {activeVisible === 'kayitlar'     && <KayitlarTab />}
+        {activeVisible === 'maclar'       && <MaclarTab />}
+        {activeVisible === 'apikey'       && <ApiKeyTab />}
+        {activeVisible === 'cark'         && <CarkTab />}
+        {activeVisible === 'log'          && <LogTab />}
+        {activeVisible === 'kullanicilar' && <KullanicilarTab />}
 
         <button className={styles.logoutBtn} onClick={handleLogout}>Çıkış Yap</button>
       </div>

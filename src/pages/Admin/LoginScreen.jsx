@@ -2,12 +2,16 @@ import { useState } from 'react'
 import styles from './LoginScreen.module.css'
 
 export default function LoginScreen({ onLogin }) {
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault()
-    const ok = onLogin(password)
+    setLoading(true)
+    const ok = await onLogin(username, password)
+    setLoading(false)
     if (!ok) {
       setError(true)
       setPassword('')
@@ -24,15 +28,26 @@ export default function LoginScreen({ onLogin }) {
         <form onSubmit={handleSubmit}>
           <input
             className={`${styles.ipt} ${styles.mb}`}
+            type="text"
+            placeholder="Kullanıcı adı"
+            value={username}
+            onChange={e => setUsername(e.target.value)}
+            autoFocus
+            autoComplete="username"
+          />
+          <input
+            className={`${styles.ipt} ${styles.mb}`}
             type="password"
             placeholder="Şifre"
             value={password}
             onChange={e => setPassword(e.target.value)}
-            autoFocus
+            autoComplete="current-password"
           />
-          <button className={styles.loginBtn} type="submit">Giriş Yap</button>
+          <button className={styles.loginBtn} type="submit" disabled={loading}>
+            {loading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          </button>
         </form>
-        {error && <div className={styles.errMsg}>❌ Yanlış şifre.</div>}
+        {error && <div className={styles.errMsg}>❌ Kullanıcı adı veya şifre hatalı.</div>}
       </div>
     </div>
   )
