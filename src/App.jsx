@@ -3,6 +3,7 @@ import { Routes, Route, Outlet } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Footer from './components/Footer'
 import CursorGlow from './components/CursorGlow'
+import LiveNotification from './components/LiveNotification'
 
 const Home      = lazy(() => import('./pages/Home'))
 const Yayincilar = lazy(() => import('./pages/Yayincilar'))
@@ -17,6 +18,7 @@ function Layout() {
     <>
       <div className="grain" aria-hidden />
       <CursorGlow />
+      <LiveNotification />
       <Navbar />
       <Outlet />
       <Footer />
