@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getSetting, setSetting, deleteSetting } from '../../../lib/supabase'
+import { getSetting, setSetting, deleteSetting, logAction } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 export default function CarkTab() {
@@ -19,6 +19,7 @@ export default function CarkTab() {
     setEnabled(next)
     if (next) await setSetting('global', 'cark_enabled', 'true')
     else await deleteSetting('global', 'cark_enabled')
+    logAction(next ? 'Çark sayfası açıldı' : 'Çark sayfası kapatıldı')
     setSucMsg(next ? '✅ Çark sayfası açıldı!' : '✅ Çark sayfası kapatıldı!')
     setTimeout(() => setSucMsg(''), 3000)
   }

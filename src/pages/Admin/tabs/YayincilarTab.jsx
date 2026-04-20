@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getBroadcasters, saveBroadcasters, uploadImage } from '../../../lib/supabase'
+import { getBroadcasters, saveBroadcasters, uploadImage, logAction } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 const EMPTY_BROADCASTER = { name: '', subtitle: 'Yayıncı', image_url: '', effect: 'none', link_url: '' }
@@ -81,6 +81,7 @@ export default function YayincilarTab() {
     setErrMsg('')
     try {
       await saveBroadcasters(yayincilar)
+      logAction(`Yayıncılar kaydedildi (${yayincilar.length} kişi)`)
       setSucMsg('✅ Kaydedildi!')
       setTimeout(() => setSucMsg(''), 3000)
     } catch {

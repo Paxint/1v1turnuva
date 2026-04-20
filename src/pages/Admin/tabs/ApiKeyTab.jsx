@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getSetting, setSetting, deleteSetting } from '../../../lib/supabase'
+import { getSetting, setSetting, deleteSetting, logAction } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 const API_KEY_PASSWORD = '37291307'
@@ -27,6 +27,7 @@ export default function ApiKeyTab() {
     const val = riotKey.trim()
     if (!val) await deleteSetting('global', 'riot_api_key')
     else      await setSetting('global', 'riot_api_key', val)
+    logAction(val ? 'Riot API Key güncellendi' : 'Riot API Key silindi')
     setSucMsg('✅ API Key kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
   }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getRules, saveRules } from '../../../lib/supabase'
+import { getRules, saveRules, logAction } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 const DEFAULT_RULES = [
@@ -41,6 +41,7 @@ export default function KurallarTab({ theme }) {
       items: (rawTexts[i] || '').split('\n').map(l => l.trim()).filter(Boolean),
     }))
     await saveRules(theme, finalRules)
+    logAction(`Kurallar kaydedildi (${theme})`)
     setSucMsg('✅ Kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
   }

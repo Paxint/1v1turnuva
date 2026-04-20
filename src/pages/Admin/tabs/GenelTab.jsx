@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getSetting, setSetting, deleteSetting } from '../../../lib/supabase'
+import { getSetting, setSetting, deleteSetting, logAction } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 export default function GenelTab({ theme, setTheme }) {
@@ -34,6 +34,7 @@ export default function GenelTab({ theme, setTheme }) {
         ? setSetting(theme, 'countdown_target', countdown.trim())
         : deleteSetting(theme, 'countdown_target'),
     ])
+    logAction(`Genel ayarlar kaydedildi (${theme})`)
     setSucMsg('✅ Kaydedildi!')
     setTimeout(() => setSucMsg(''), 3000)
   }

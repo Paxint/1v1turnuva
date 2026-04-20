@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { getSetting, setSetting, deleteSetting, uploadImage } from '../../../lib/supabase'
+import { getSetting, setSetting, deleteSetting, uploadImage, logAction } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
 export default function PosterlerTab({ theme }) {
@@ -21,6 +21,7 @@ export default function PosterlerTab({ theme }) {
 
   async function savePoster(src) {
     await setSetting(theme, 'poster_url', src)
+    logAction(`Poster güncellendi (${theme})`)
     setImgError(false)
     setPosterSrc(src)
     setSucMsg('✅ Kaydedildi!')
@@ -47,6 +48,7 @@ export default function PosterlerTab({ theme }) {
   async function resetPoster() {
     if (!window.confirm('Poster sıfırlansın mı?')) return
     await deleteSetting(theme, 'poster_url')
+    logAction(`Poster sıfırlandı (${theme})`)
     setPosterSrc('/poster.png')
     setSucMsg('✅ Sıfırlandı!')
     setTimeout(() => setSucMsg(''), 3000)
