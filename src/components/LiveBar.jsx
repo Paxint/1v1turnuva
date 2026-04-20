@@ -51,7 +51,7 @@ export default function LiveBar() {
     return () => clearInterval(interval)
   }, [runCheck])
 
-  if (location.pathname === '/yayincilar') return null
+  if (location.pathname === '/yayincilar' || location.pathname === '/') return null
   if (liveBroadcasters.length === 0) return null
 
   return (
