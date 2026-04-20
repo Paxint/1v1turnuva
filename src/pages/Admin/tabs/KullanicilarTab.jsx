@@ -9,7 +9,8 @@ const ROLE_LABELS = {
   moderator:  '🛡️ Moderatör',
 }
 
-export default function KullanicilarTab() {
+export default function KullanicilarTab({ role }) {
+  const isSA = role === 'superadmin'
   const [users, setUsers]       = useState([])
   const [loading, setLoading]   = useState(true)
   const [msg, setMsg]           = useState('')
@@ -77,8 +78,8 @@ export default function KullanicilarTab() {
   return (
     <div className={styles.wrap}>
 
-      {/* Yeni kullanıcı oluştur */}
-      <div className={styles.section}>
+      {/* Yeni kullanıcı oluştur — sadece superadmin */}
+      {isSA && <div className={styles.section}>
         <h3 className={styles.sectionTitle}>➕ Yeni Kullanıcı</h3>
         <form className={styles.createForm} onSubmit={handleCreate}>
           <input
@@ -108,7 +109,7 @@ export default function KullanicilarTab() {
             {creating ? 'Oluşturuluyor...' : 'Oluştur'}
           </button>
         </form>
-      </div>
+      </div>}
 
       {/* Kullanıcı listesi */}
       <div className={styles.section}>
@@ -126,7 +127,7 @@ export default function KullanicilarTab() {
                   <span className={styles.userRole}>{ROLE_LABELS[u.role] ?? u.role}</span>
                 </div>
 
-                {editId === u.id ? (
+                {isSA && (editId === u.id ? (
                   <div className={styles.editRow}>
                     <input
                       className={styles.ipt}
@@ -159,7 +160,7 @@ export default function KullanicilarTab() {
                       🗑️ Sil
                     </button>
                   </div>
-                )}
+                ))}
               </div>
             ))}
           </div>

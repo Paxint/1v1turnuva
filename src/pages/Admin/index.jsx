@@ -31,7 +31,7 @@ const TABS = [
   { id: 'apikey',       label: '🔑 API Key',      roles: SA   },
   { id: 'cark',         label: '🎡 Çark',         roles: ALL  },
   { id: 'log',          label: '📊 Log',          roles: ALL  },
-  { id: 'kullanicilar', label: '👥 Kullanıcılar', roles: SA   },
+  { id: 'kullanicilar', label: '👥 Kullanıcılar', roles: ALL  },
 ]
 
 function getSession() {
@@ -119,7 +119,7 @@ export default function Admin() {
         {activeVisible === 'apikey'       && <ApiKeyTab />}
         {activeVisible === 'cark'         && <CarkTab />}
         {activeVisible === 'log'          && <LogTab />}
-        {activeVisible === 'kullanicilar' && <KullanicilarTab />}
+        {activeVisible === 'kullanicilar' && <KullanicilarTab role={role} />}
 
         <button className={styles.logoutBtn} onClick={handleLogout}>Çıkış Yap</button>
       </div>
