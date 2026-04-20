@@ -174,7 +174,8 @@ export async function logAction(action) {
   try {
     const session = JSON.parse(sessionStorage.getItem('paxint_admin_session') || '{}')
     const username = session.username || 'bilinmiyor'
-    await supabase.from('admin_logs').insert({ username, action })
+    const { error } = await supabase.from('admin_logs').insert({ username, action })
+    logErr('logAction', error)
   } catch (e) { logErr('logAction', e) }
 }
 
