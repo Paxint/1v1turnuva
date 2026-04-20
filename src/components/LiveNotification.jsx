@@ -4,18 +4,8 @@ import { getBroadcasters } from '../lib/supabase'
 import { extractKickUsername } from '../lib/kickUtils'
 import styles from './LiveNotification.module.css'
 
-const SEEN_KEY   = 'paxint_live_seen'   // sessionStorage: set of usernames shown this session
 const CHECK_MS   = 2 * 60 * 1000        // 2 dakika
 const SHOW_MS    = 7000                 // 7 saniye görünür
-
-function getSeenSet() {
-  try { return new Set(JSON.parse(sessionStorage.getItem(SEEN_KEY) || '[]')) }
-  catch { return new Set() }
-}
-function addSeen(username) {
-  const s = getSeenSet(); s.add(username)
-  sessionStorage.setItem(SEEN_KEY, JSON.stringify([...s]))
-}
 
 async function checkLive(broadcasters) {
   const results = {}
@@ -69,14 +59,12 @@ export default function LiveNotification() {
     const list = broadcastersRef.current
     if (!list.length) return
     const liveMap = await checkLive(list)
-    const seen    = getSeenSet()
-    const newOnes = list.filter(b => {
+    const liveOnes = list.filter(b => {
       const u = extractKickUsername(b.link_url)
-      return u && liveMap[u] && !seen.has(u)
+      return u && liveMap[u]
     })
-    newOnes.forEach(b => addSeen(extractKickUsername(b.link_url)))
-    if (newOnes.length > 0) {
-      setQueue(q => [...q, ...newOnes])
+    if (liveOnes.length > 0) {
+      setQueue(q => [...q, ...liveOnes])
     }
   }, [])
 
