@@ -159,3 +159,76 @@
   color: rgba(212,245,192,0.3);
   font-style: italic;
 }
+
+/* ─── Son Yapılan İşlemler ─── */
+.actionSection {
+  margin-top: 2rem;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.actionHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.actionTitle {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(212,245,192,0.5);
+}
+
+.actionSub {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: rgba(212,245,192,0.25);
+}
+
+.actionList {
+  display: flex;
+  flex-direction: column;
+}
+
+.actionRow {
+  display: flex;
+  align-items: baseline;
+  gap: 0.8rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid rgba(212,245,192,0.04);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 0.875rem;
+  transition: background 0.1s;
+}
+.actionRow:last-child { border-bottom: none; }
+.actionRow:hover { background: rgba(83,252,24,0.03); }
+
+.actionTime {
+  color: rgba(212,245,192,0.3);
+  font-size: 0.78rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+  letter-spacing: 0.03em;
+}
+
+.actionUser {
+  color: var(--green);
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-width: 90px;
+  letter-spacing: 0.04em;
+}
+
+.actionText {
+  color: var(--text);
+  letter-spacing: 0.02em;
+}

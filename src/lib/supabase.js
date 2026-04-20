@@ -167,6 +167,30 @@ export async function saveBracket(data) {
   return setSetting('global', 'bracket', JSON.stringify(data))
 }
 
+// ─── Admin Action Logs ───────────────────────────────────────────────────────
+
+export async function logAction(action) {
+  if (!isConfigured) return
+  try {
+    const session = JSON.parse(sessionStorage.getItem('paxint_admin_session') || '{}')
+    const username = session.username || 'bilinmiyor'
+    await supabase.from('admin_logs').insert({ username, action })
+  } catch (e) { logErr('logAction', e) }
+}
+
+export async function getAdminLogs(limit = 100) {
+  if (!isConfigured) return []
+  try {
+    const { data, error } = await supabase
+      .from('admin_logs')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(limit)
+    logErr('getAdminLogs', error)
+    return data ?? []
+  } catch (e) { logErr('getAdminLogs', e); return [] }
+}
+
 // ─── Admin Users ─────────────────────────────────────────────────────────────
 
 async function hashPassword(password) {

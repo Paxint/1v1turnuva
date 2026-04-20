@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { getVisitCounts } from '../../../lib/supabase'
+import { getVisitCounts, getAdminLogs } from '../../../lib/supabase'
 import styles from './LogTab.module.css'
 
 function fmt(dateStr) {
@@ -8,15 +8,26 @@ function fmt(dateStr) {
   return `${d}.${m}.${y}`
 }
 
+function fmtTs(ts) {
+  const d = new Date(ts)
+  const pad = n => String(n).padStart(2, '0')
+  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
+}
+
 export default function LogTab() {
   const [rows, setRows] = useState(null)
   const [loading, setLoading] = useState(true)
+  const [logs, setLogs] = useState(null)
+  const [logsLoading, setLogsLoading] = useState(true)
 
   const load = useCallback(async () => {
     setLoading(true)
-    const data = await getVisitCounts()
-    setRows(data)
+    setLogsLoading(true)
+    const [visitData, logData] = await Promise.all([getVisitCounts(), getAdminLogs(50)])
+    setRows(visitData)
+    setLogs(logData)
     setLoading(false)
+    setLogsLoading(false)
   }, [])
 
   useEffect(() => { load() }, [load])
@@ -86,6 +97,30 @@ export default function LogTab() {
       <p className={styles.note}>
         * IP adresleri saklanmıyor. Ziyaretçiler SHA-256 ile anonimleştirilmiş hash olarak sayılıyor.
       </p>
+
+      {/* ─── Son Yapılan İşlemler ─── */}
+      <div className={styles.actionSection}>
+        <div className={styles.actionHeader}>
+          <span className={styles.actionTitle}>⚡ Son Yapılan İşlemler</span>
+          <span className={styles.actionSub}>son 50 kayıt</span>
+        </div>
+
+        {logsLoading ? (
+          <div className={styles.empty}>Yükleniyor...</div>
+        ) : !logs || logs.length === 0 ? (
+          <div className={styles.empty}>Henüz işlem kaydı yok.</div>
+        ) : (
+          <div className={styles.actionList}>
+            {logs.map(log => (
+              <div key={log.id} className={styles.actionRow}>
+                <span className={styles.actionTime}>{fmtTs(log.created_at)}</span>
+                <span className={styles.actionUser}>{log.username}</span>
+                <span className={styles.actionText}>{log.action}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { getAdminUsers, createAdminUser, updateAdminUserPassword, deleteAdminUser } from '../../../lib/supabase'
+import { getAdminUsers, createAdminUser, updateAdminUserPassword, deleteAdminUser, logAction } from '../../../lib/supabase'
 import styles from './KullanicilarTab.module.css'
 import tabStyles from './Tabs.module.css'
 
@@ -48,6 +48,7 @@ export default function KullanicilarTab() {
     setNewUsername('')
     setNewPassword('')
     setNewRole('moderator')
+    logAction(`Kullanıcı oluşturuldu: ${newUsername.trim()} (${newRole})`)
     flash('✅ Kullanıcı oluşturuldu')
     load()
   }
@@ -58,6 +59,8 @@ export default function KullanicilarTab() {
     const err = await updateAdminUserPassword(id, editPassword)
     setSaving(false)
     if (err) { flash('❌ Hata: ' + (err.message ?? err)); return }
+    const editedUser = users.find(u => u.id === id)
+    logAction(`Şifre değiştirildi: ${editedUser?.username ?? id}`)
     setEditId(null)
     setEditPassword('')
     flash('✅ Şifre güncellendi')
@@ -66,6 +69,7 @@ export default function KullanicilarTab() {
   async function handleDelete(id, uname) {
     if (!window.confirm(`"${uname}" kullanıcısı silinsin mi?`)) return
     await deleteAdminUser(id)
+    logAction(`Kullanıcı silindi: ${uname}`)
     flash('✅ Kullanıcı silindi')
     load()
   }

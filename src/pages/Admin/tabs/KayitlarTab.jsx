@@ -7,6 +7,7 @@ import {
   saveBracket,
   getSetting,
   setSetting,
+  logAction,
 } from '../../../lib/supabase'
 import styles from './Tabs.module.css'
 
@@ -83,19 +84,23 @@ export default function KayitlarTab() {
       return
     }
     setAddKick(''); setAddLol('')
+    logAction(`Kayıt eklendi: ${kick}${regMode === 'kick_lol' && lol ? ` / ${lol}` : ''}`)
     setAddSuc('✅ Eklendi!')
     setTimeout(() => setAddSuc(''), 3000)
     load()
   }
 
   async function handleDelete(id) {
+    const row = list.find(r => r.id === id)
     await deleteRegistration(id)
+    logAction(`Kayıt silindi: ${row?.kick_nick ?? id}`)
     load()
   }
 
   async function handleClearAll() {
     if (!window.confirm('Tüm kayıtlar silinsin mi?')) return
     await clearRegistrations()
+    logAction('Tüm kayıtlar silindi')
     setExportText('')
     load()
   }
@@ -105,6 +110,7 @@ export default function KayitlarTab() {
     if (!window.confirm(`${list.length} oyuncuyla bracket oluşturulsun mu?`)) return
     const bracket = buildBracket(list.map(r => regMode === 'kick_only' ? r.kick_nick : r.lol_nick))
     await saveBracket(bracket)
+    logAction(`Bracket oluşturuldu (${list.length} oyuncu)`)
     setBracketMsg('✅ Bracket oluşturuldu!')
     setTimeout(() => setBracketMsg(''), 3000)
   }
@@ -112,6 +118,7 @@ export default function KayitlarTab() {
   async function handleClearBracket() {
     if (!window.confirm('Bracket silinsin mi?')) return
     await saveBracket(null)
+    logAction('Bracket silindi (Kayıtlar sekmesinden)')
     setBracketMsg('✅ Bracket silindi.')
     setTimeout(() => setBracketMsg(''), 3000)
   }

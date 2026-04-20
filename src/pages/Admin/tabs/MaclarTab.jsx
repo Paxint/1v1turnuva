@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { getBracket, saveBracket, subscribeToTable, getRegistrations } from '../../../lib/supabase'
+import { getBracket, saveBracket, subscribeToTable, getRegistrations, logAction } from '../../../lib/supabase'
 import styles from './MaclarTab.module.css'
 import tabStyles from './Tabs.module.css'
 
@@ -208,12 +208,14 @@ export default function MaclarTab() {
     }
     setBracket(next)
     await saveBracket(next)
+    logAction(`${winner} kazandı (${roundName(rIdx, next.rounds.length)})`)
     setMsg('✅ Kaydedildi')
     setTimeout(() => setMsg(''), 2000)
   }
 
   async function handleClear(rIdx, mIdx) {
     const next = JSON.parse(JSON.stringify(bracket))
+    const prevWinner = bracket.rounds[rIdx][mIdx].winner
     clearWinner(next.rounds, rIdx, mIdx)
     if (next.thirdPlace && rIdx === sfIdx) {
       if (mIdx === 0) next.thirdPlace.p1 = null
@@ -222,6 +224,7 @@ export default function MaclarTab() {
     }
     setBracket(next)
     await saveBracket(next)
+    logAction(`Kazanan kaldırıldı: ${prevWinner} (${roundName(rIdx, next.rounds.length)})`)
     setMsg('✅ Kaydedildi')
     setTimeout(() => setMsg(''), 2000)
   }
@@ -231,6 +234,7 @@ export default function MaclarTab() {
     next.thirdPlace.winner = winner
     setBracket(next)
     await saveBracket(next)
+    logAction(`3. yer maçı kazananı: ${winner}`)
     setMsg('✅ Kaydedildi')
     setTimeout(() => setMsg(''), 2000)
   }
@@ -240,6 +244,7 @@ export default function MaclarTab() {
     next.thirdPlace.winner = null
     setBracket(next)
     await saveBracket(next)
+    logAction('3. yer maçı kazananı kaldırıldı')
     setMsg('✅ Kaydedildi')
     setTimeout(() => setMsg(''), 2000)
   }
@@ -248,6 +253,7 @@ export default function MaclarTab() {
     if (!window.confirm('Bracket silinsin mi?')) return
     await saveBracket(null)
     setBracket(null)
+    logAction('Bracket silindi')
     setMsg('✅ Bracket silindi.')
     setTimeout(() => setMsg(''), 2000)
   }
@@ -257,6 +263,7 @@ export default function MaclarTab() {
     const next = reshuffleBracket(bracket)
     setBracket(next)
     await saveBracket(next)
+    logAction('Bracket yeniden karıştırıldı')
     setMsg('✅ Bracket yeniden karıştırıldı.')
     setTimeout(() => setMsg(''), 2500)
   }
@@ -273,6 +280,7 @@ export default function MaclarTab() {
     if (next.thirdPlace) { next.thirdPlace.p1 = null; next.thirdPlace.p2 = null; next.thirdPlace.winner = null }
     setBracket(next)
     await saveBracket(next)
+    logAction('Bracket başa döndürüldü')
     setMsg('✅ Bracket başa döndürüldü.')
     setTimeout(() => setMsg(''), 2000)
   }
@@ -308,6 +316,7 @@ export default function MaclarTab() {
     setBracket(next)
     saveBracket(next)
     setSwapSel(null)
+    logAction(`Maç yerleri değiştirildi: ${roundName(rIdx, next.rounds.length)} M${swapSel.mIdx + 1} ↔ M${mIdx + 1}`)
     setMsg('✅ Maçlar yer değiştirdi')
     setTimeout(() => setMsg(''), 2000)
   }
