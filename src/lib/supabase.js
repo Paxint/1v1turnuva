@@ -11,7 +11,32 @@ function logErr(fn, error) {
   if (error) console.error(`[supabase] ${fn}:`, error.message ?? error)
 }
 
-// ─── Settings ───────────────────────────────────────────────────────────────
+// ─── Admin API helper ────────────────────────────────────────────────────────
+
+function getAdminToken() {
+  try {
+    return JSON.parse(sessionStorage.getItem('paxint_admin_session') || '{}').token ?? null
+  } catch { return null }
+}
+
+async function adminApi(action, payload = {}) {
+  const token = getAdminToken()
+  const res = await fetch('/api/admin', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ action, payload }),
+  })
+  if (!res.ok) {
+    const body = await res.json().catch(() => ({}))
+    throw new Error(body.error || `Admin API error ${res.status}`)
+  }
+  return res.json()
+}
+
+// ─── Settings ────────────────────────────────────────────────────────────────
 
 export async function getSetting(broadcaster, key) {
   if (!isConfigured) return null
@@ -29,20 +54,16 @@ export async function getSetting(broadcaster, key) {
 
 export async function setSetting(broadcaster, key, value) {
   if (!isConfigured) return
-  const { error } = await supabase
-    .from('settings')
-    .upsert({ broadcaster, key, value }, { onConflict: 'broadcaster,key' })
-  logErr('setSetting', error)
+  try {
+    await adminApi('setSetting', { broadcaster, key, value })
+  } catch (e) { logErr('setSetting', e) }
 }
 
 export async function deleteSetting(broadcaster, key) {
   if (!isConfigured) return
-  const { error } = await supabase
-    .from('settings')
-    .delete()
-    .eq('broadcaster', broadcaster)
-    .eq('key', key)
-  logErr('deleteSetting', error)
+  try {
+    await adminApi('deleteSetting', { broadcaster, key })
+  } catch (e) { logErr('deleteSetting', e) }
 }
 
 // ─── Broadcasters ────────────────────────────────────────────────────────────
@@ -50,7 +71,11 @@ export async function deleteSetting(broadcaster, key) {
 export async function getBroadcasters() {
   if (!isConfigured) return []
   try {
-    const { data, error } = await supabase.from('broadcasters').select('*').eq('broadcaster_key', 'shared').order('sort_order')
+    const { data, error } = await supabase
+      .from('broadcasters')
+      .select('*')
+      .eq('broadcaster_key', 'shared')
+      .order('sort_order')
     logErr('getBroadcasters', error)
     return data ?? []
   } catch (e) { logErr('getBroadcasters', e); return [] }
@@ -58,21 +83,9 @@ export async function getBroadcasters() {
 
 export async function saveBroadcasters(list) {
   if (!isConfigured) return
-  const { error: delErr } = await supabase.from('broadcasters').delete().eq('broadcaster_key', 'shared')
-  logErr('saveBroadcasters(delete)', delErr)
-  if (list.length === 0) return
-  const { error: insErr } = await supabase.from('broadcasters').insert(
-    list.map((b, i) => ({
-      broadcaster_key: 'shared',
-      sort_order: i,
-      name: b.name,
-      subtitle: b.subtitle,
-      image_url: b.image_url || '',
-      effect: b.effect || 'none',
-      link_url: b.link_url || '',
-    }))
-  )
-  logErr('saveBroadcasters(insert)', insErr)
+  try {
+    await adminApi('saveBroadcasters', { list })
+  } catch (e) { logErr('saveBroadcasters', e) }
 }
 
 // ─── Rules ───────────────────────────────────────────────────────────────────
@@ -92,18 +105,9 @@ export async function getRules(broadcaster) {
 
 export async function saveRules(broadcaster, rules) {
   if (!isConfigured) return
-  const { error: delErr } = await supabase.from('rules').delete().eq('broadcaster', broadcaster)
-  logErr('saveRules(delete)', delErr)
-  if (rules.length === 0) return
-  const { error: insErr } = await supabase.from('rules').insert(
-    rules.map((r, i) => ({
-      broadcaster,
-      title: r.title,
-      items: r.items,
-      sort_order: i,
-    }))
-  )
-  logErr('saveRules(insert)', insErr)
+  try {
+    await adminApi('saveRules', { broadcaster, rules })
+  } catch (e) { logErr('saveRules', e) }
 }
 
 // ─── Registrations ───────────────────────────────────────────────────────────
@@ -133,14 +137,16 @@ export async function addRegistration(kickNick, lolNick) {
 
 export async function deleteRegistration(id) {
   if (!isConfigured) return
-  const { error } = await supabase.from('registrations').delete().eq('id', id)
-  logErr('deleteRegistration', error)
+  try {
+    await adminApi('deleteRegistration', { id })
+  } catch (e) { logErr('deleteRegistration', e) }
 }
 
 export async function clearRegistrations() {
   if (!isConfigured) return
-  const { error } = await supabase.from('registrations').delete().neq('id', 0)
-  logErr('clearRegistrations', error)
+  try {
+    await adminApi('clearRegistrations')
+  } catch (e) { logErr('clearRegistrations', e) }
 }
 
 // ─── Realtime ────────────────────────────────────────────────────────────────
@@ -174,20 +180,14 @@ export async function logAction(action) {
   try {
     const session = JSON.parse(sessionStorage.getItem('paxint_admin_session') || '{}')
     const username = session.username || 'bilinmiyor'
-    const { error } = await supabase.from('admin_logs').insert({ username, action })
-    logErr('logAction', error)
+    await adminApi('logAction', { username, action })
   } catch (e) { logErr('logAction', e) }
 }
 
 export async function getAdminLogs(limit = 100) {
   if (!isConfigured) return []
   try {
-    const { data, error } = await supabase
-      .from('admin_logs')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(limit)
-    logErr('getAdminLogs', error)
+    const { data } = await adminApi('getAdminLogs', { limit })
     return data ?? []
   } catch (e) { logErr('getAdminLogs', e); return [] }
 }
@@ -199,29 +199,10 @@ async function hashPassword(password) {
   return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('')
 }
 
-export async function getAdminUserByCredentials(username, password) {
-  if (!isConfigured) return null
-  try {
-    const hash = await hashPassword(password)
-    const { data, error } = await supabase
-      .from('admin_users')
-      .select('id, username, role')
-      .eq('username', username)
-      .eq('password_hash', hash)
-      .maybeSingle()
-    logErr('getAdminUserByCredentials', error)
-    return data ?? null
-  } catch (e) { logErr('getAdminUserByCredentials', e); return null }
-}
-
 export async function getAdminUsers() {
   if (!isConfigured) return []
   try {
-    const { data, error } = await supabase
-      .from('admin_users')
-      .select('id, username, role, created_at')
-      .order('created_at', { ascending: true })
-    logErr('getAdminUsers', error)
+    const { data } = await adminApi('getAdminUsers')
     return data ?? []
   } catch (e) { logErr('getAdminUsers', e); return [] }
 }
@@ -230,13 +211,8 @@ export async function createAdminUser(username, password, role) {
   if (!isConfigured) return { data: null, error: new Error('Supabase not configured') }
   try {
     const password_hash = await hashPassword(password)
-    const { data, error } = await supabase
-      .from('admin_users')
-      .insert({ username, password_hash, role })
-      .select()
-      .single()
-    logErr('createAdminUser', error)
-    return { data, error }
+    const { data } = await adminApi('createAdminUser', { username, password_hash, role })
+    return { data, error: null }
   } catch (e) { logErr('createAdminUser', e); return { data: null, error: e } }
 }
 
@@ -244,19 +220,16 @@ export async function updateAdminUserPassword(id, newPassword) {
   if (!isConfigured) return new Error('Supabase not configured')
   try {
     const password_hash = await hashPassword(newPassword)
-    const { error } = await supabase
-      .from('admin_users')
-      .update({ password_hash })
-      .eq('id', id)
-    logErr('updateAdminUserPassword', error)
-    return error
+    await adminApi('updateAdminUserPassword', { id, password_hash })
+    return null
   } catch (e) { logErr('updateAdminUserPassword', e); return e }
 }
 
 export async function deleteAdminUser(id) {
   if (!isConfigured) return
-  const { error } = await supabase.from('admin_users').delete().eq('id', id)
-  logErr('deleteAdminUser', error)
+  try {
+    await adminApi('deleteAdminUser', { id })
+  } catch (e) { logErr('deleteAdminUser', e) }
 }
 
 // ─── Visit counts ────────────────────────────────────────────────────────────
@@ -264,13 +237,8 @@ export async function deleteAdminUser(id) {
 export async function getVisitCounts() {
   if (!isConfigured) return []
   try {
-    const { data, error } = await supabase
-      .from('visits')
-      .select('date')
-      .order('date', { ascending: false })
-    logErr('getVisitCounts', error)
+    const { data } = await adminApi('getVisitCounts')
     if (!data) return []
-    // Group by date in JS — never expose individual hashes
     const map = {}
     for (const row of data) {
       map[row.date] = (map[row.date] || 0) + 1
