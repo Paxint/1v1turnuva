@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createHash } from 'crypto'
 
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL
-const supabaseServiceKey = process.env.SUPABASE_SERVICE_KEY
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 const adminSecret = process.env.ADMIN_SECRET
 
 function supa() {
