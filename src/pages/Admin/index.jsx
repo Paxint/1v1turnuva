@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useTheme } from '../../context/ThemeContext'
-import { getAdminUserByCredentials } from '../../lib/supabase'
 import LoginScreen from './LoginScreen'
 import GenelTab from './tabs/GenelTab'
 import PosterlerTab from './tabs/PosterlerTab'
@@ -14,7 +13,6 @@ import LogTab from './tabs/LogTab'
 import KullanicilarTab from './tabs/KullanicilarTab'
 import styles from './Admin.module.css'
 
-const ADMIN_PASSWORD = import.meta.env.VITE_ADMIN_PASSWORD || 'Paxint2026'
 const SESSION_KEY = 'paxint_admin_session'
 
 const ALL  = ['superadmin', 'yayinci', 'moderator']
@@ -46,26 +44,23 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState('genel')
 
   async function handleLogin(uname, password) {
-    // Supabase'deki kullanıcıları dene
-    const user = await getAdminUserByCredentials(uname, password)
-    if (user) {
-      const session = { role: user.role, username: user.username }
+    try {
+      const res = await fetch('/api/admin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'login', username: uname, password }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.token) return false
+      const session = { role: json.user.role, username: json.user.username, token: json.token }
       sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
-      setRole(user.role)
-      setUsername(user.username)
+      setRole(json.user.role)
+      setUsername(json.user.username)
       setLoggedIn(true)
       return true
+    } catch {
+      return false
     }
-    // Eski env-var superadmin fallback
-    if (uname === 'admin' && password === ADMIN_PASSWORD) {
-      const session = { role: 'superadmin', username: 'admin' }
-      sessionStorage.setItem(SESSION_KEY, JSON.stringify(session))
-      setRole('superadmin')
-      setUsername('admin')
-      setLoggedIn(true)
-      return true
-    }
-    return false
   }
 
   function handleLogout() {
